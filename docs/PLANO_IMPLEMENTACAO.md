@@ -243,16 +243,18 @@ Drag-and-drop com `@dnd-kit/core` + `@dnd-kit/sortable`. Backend **revalida semp
 
 ## Fases de implementação dentro do MVP
 
-1. Fundação: migrations completas (incluindo `companies` e satélites, lookups geográficos/CNAE, `opt_outs`, `import_*`, `lead_scoring_rules`, `loss_reason_recycle_rules`, `audit_logs` com actor polimórfico), models, trait `Auditable` aplicada a Lead/Company/Proposal/FollowUp desde o início, seeders (states/cities/cnaes/legal_natures via fixture oficial), Breeze, RBAC, Policies (incluindo `AuditLogPolicy`).
-2. Importação de Companies + CRUD de Leads + Kanban estático: wizard de importação CSV com mapeamento de colunas (auto-detecção + ajuste manual + perfis salvos), `AuditContext::actingAs('import', ...)` no `ProcessCsvImportJob`, tela "Companies sem lead ativo", Kanban sem drag-and-drop ainda.
-3. Máquina de estados + histórico unificado + drag-and-drop funcional.
-4. Follow-up + Propostas (upload e versionamento).
-5. Compliance operacional: `opt_outs` no fluxo de interação, `CallWindowValidator`, contador de frequência por `phone_dialed`, aviso de empresa baixada, `contact_attempts_count` + sugestão de "sem retorno".
-6. Distribuição de leads (manual → round-robin/regras, usando geografia normalizada).
-7. Lead Scoring básico: fit score (regras configuráveis) + intent score simplificado + badge no card.
-8. SLA + auditoria avançada (jobs, alertas incluindo `attempts_exhausted`, arquivamento mensal, tela `Admin/Audit` com `AuditLogReconstructor` para reconstrução por data).
-9. Painel gerencial básico (contagens por etapa/consultor/equipe/origem, export CSV).
-10. Hardening: testes Pest (transições inválidas, RBAC, append-only, dedupe de CNPJ, validação de janela de horário, bloqueio/aviso de opt-out, diffs do `Auditable` em update/import, reconstrução de estado em data passada), revisão de N+1 no board com joins de `companies`.
+> Status atualizado conforme o trabalho avança — ver também `CLAUDE.md` ("Estado do projeto") para o detalhe de arquivos. Ao concluir uma fase, marcar aqui antes de encerrar a sessão, para que outra sessão/console saiba exatamente onde retomar.
+
+1. ✅ **Concluída.** Fundação: migrations completas (incluindo `companies` e satélites, lookups geográficos/CNAE, `opt_outs`, `import_*`, `lead_scoring_rules`, `loss_reason_recycle_rules`, `audit_logs` com actor polimórfico), models, trait `Auditable` aplicada a Lead/Company/Proposal/FollowUp desde o início, seeders (states/cities/cnaes/legal_natures — **amostra de desenvolvimento**, não o fixture oficial completo; ver comentários em `database/seeders/`), Breeze, RBAC, Policies (incluindo `AuditLogPolicy`). Validado com `sail artisan migrate --seed` + 32 testes Pest + Pint sem pendências.
+2. ⬜ Pendente. Importação de Companies + CRUD de Leads + Kanban estático: wizard de importação CSV com mapeamento de colunas (auto-detecção + ajuste manual + perfis salvos), `AuditContext::actingAs('import', ...)` no `ProcessCsvImportJob`, tela "Companies sem lead ativo", Kanban sem drag-and-drop ainda.
+3. ⬜ Pendente. Máquina de estados (`LeadStageTransitionService`, grafo de transições) + histórico unificado + drag-and-drop funcional.
+4. ⬜ Pendente. Follow-up + Propostas (upload e versionamento).
+5. ⬜ Pendente. Compliance operacional: `opt_outs` no fluxo de interação, `CallWindowValidator`, contador de frequência por `phone_dialed`, aviso de empresa baixada, `contact_attempts_count` + sugestão de "sem retorno".
+6. ⬜ Pendente. Distribuição de leads (manual → round-robin/regras, usando geografia normalizada).
+7. ⬜ Pendente. Lead Scoring básico: fit score (regras configuráveis) + intent score simplificado + badge no card.
+8. ⬜ Pendente. SLA + auditoria avançada (jobs, alertas incluindo `attempts_exhausted`, arquivamento mensal, tela `Admin/Audit` com `AuditLogReconstructor` para reconstrução por data).
+9. ⬜ Pendente. Painel gerencial básico (contagens por etapa/consultor/equipe/origem, export CSV).
+10. ⬜ Pendente. Hardening: testes Pest (transições inválidas, RBAC, append-only, dedupe de CNPJ, validação de janela de horário, bloqueio/aviso de opt-out, diffs do `Auditable` em update/import, reconstrução de estado em data passada), revisão de N+1 no board com joins de `companies`.
 
 ## Espaço para Fase 2 sem migração destrutiva
 

@@ -1,4 +1,4 @@
-# LevelEad CRM — Kanban para Call Center Outbound
+# LeveLead CRM — Kanban para Call Center Outbound
 
 Plataforma de CRM em Kanban para gestão de leads B2B em operação de call center outbound, com importação e enriquecimento de base de empresas via CNPJ, distribuição automática de leads, regras de SLA, lead scoring, compliance LGPD/ANATEL e auditoria/versionamento de dados.
 
@@ -14,7 +14,11 @@ Plataforma de CRM em Kanban para gestão de leads B2B em operação de call cent
 
 ## Documentação
 
+- [`CLAUDE.md`](CLAUDE.md) — guia de convenções e arquitetura para trabalho assistido por IA neste repositório.
 - [`docs/PLANO_IMPLEMENTACAO.md`](docs/PLANO_IMPLEMENTACAO.md) — plano completo de implementação: contexto, decisões de arquitetura, modelo de dados (Company × Lead), auditoria/versionamento, compliance LGPD/ANATEL, lead scoring, máquina de estados do Kanban, arquitetura de código, fases de implementação e critérios de verificação.
+- [`docs/GLOSSARIO.md`](docs/GLOSSARIO.md) — dicionário dos termos de domínio (Lead, Company, stages, scores, compliance, auditoria).
+- [`docs/SETUP.md`](docs/SETUP.md) — passo a passo de instalação e ambiente local (alvo para a Fase 1, projeto ainda não scaffolded).
+- [`.env.example`](.env.example) — esqueleto de variáveis de ambiente alvo.
 
 ## Escopo da v1 (MVP robusto)
 
