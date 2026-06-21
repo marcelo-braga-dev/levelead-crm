@@ -29,7 +29,7 @@ interface UserRow {
 }
 
 const roleLabels: Record<UserRole, string> = {
-    admin: 'Admin',
+    admin: 'Administrador',
     manager: 'Gestor',
     consultant: 'Consultor',
 };
@@ -167,7 +167,7 @@ export default function UsersIndex({ users, teams }: { users: UserRow[]; teams: 
                             value={form.data.role}
                             onChange={(e) => form.setData('role', e.target.value as UserRole)}
                         >
-                            <MenuItem value="admin">Admin</MenuItem>
+                            <MenuItem value="admin">Administrador</MenuItem>
                             <MenuItem value="manager">Gestor</MenuItem>
                             <MenuItem value="consultant">Consultor</MenuItem>
                         </TextField>

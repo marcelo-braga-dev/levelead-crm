@@ -79,6 +79,7 @@ class ImportCompaniesFromCsvAction
 
         $company = Company::query()->updateOrCreate(['cnpj' => $cnpj], $attributes);
 
+        $this->upsertAddress($company, $data);
         $this->recordHistorySnapshots($company, $batch, $previous);
         $this->upsertPrimaryContacts($company, $data);
 
@@ -90,10 +91,6 @@ class ImportCompaniesFromCsvAction
     /** @param array<string, string|null> $data */
     private function buildCompanyAttributes(array $data, ImportBatch $batch, string $cnpj): array
     {
-        $state = isset($data['uf']) ? State::query()->where('uf', mb_strtoupper($data['uf']))->first() : null;
-        $city = isset($data['city_name']) && $state
-            ? City::query()->where('state_id', $state->id)->whereRaw('UPPER(name) = ?', [mb_strtoupper($data['city_name'])])->first()
-            : null;
         $cnae = isset($data['cnae_code']) ? Cnae::query()->where('code', $data['cnae_code'])->first() : null;
         $legalNature = isset($data['legal_nature_code']) ? LegalNature::query()->where('code', $data['legal_nature_code'])->first() : null;
 
@@ -101,13 +98,6 @@ class ImportCompaniesFromCsvAction
             'cnpj' => $cnpj,
             'razao_social' => $data['razao_social'],
             'nome_fantasia' => $data['nome_fantasia'] ?? null,
-            'logradouro' => $data['logradouro'] ?? null,
-            'numero' => $data['numero'] ?? null,
-            'complemento' => $data['complemento'] ?? null,
-            'bairro' => $data['bairro'] ?? null,
-            'cep' => isset($data['cep']) ? preg_replace('/\D/', '', $data['cep']) : null,
-            'city_id' => $city?->id,
-            'state_id' => $state?->id,
             'matriz_filial' => $this->normalizeMatrizFilial($data['matriz_filial'] ?? null),
             'ente_federativo' => $data['ente_federativo'] ?? null,
             'primary_cnae_id' => $cnae?->id,
@@ -131,6 +121,31 @@ class ImportCompaniesFromCsvAction
             'last_import_batch_id' => $batch->id,
             'last_enriched_at' => now(),
         ];
+    }
+
+    /** @param array<string, string|null> $data */
+    private function upsertAddress(Company $company, array $data): void
+    {
+        $state = isset($data['uf']) ? State::query()->where('uf', mb_strtoupper($data['uf']))->first() : null;
+        $city = isset($data['city_name']) && $state
+            ? City::query()->where('state_id', $state->id)->whereRaw('UPPER(name) = ?', [mb_strtoupper($data['city_name'])])->first()
+            : null;
+
+        $attributes = [
+            'logradouro' => $data['logradouro'] ?? null,
+            'numero' => $data['numero'] ?? null,
+            'complemento' => $data['complemento'] ?? null,
+            'bairro' => $data['bairro'] ?? null,
+            'cep' => isset($data['cep']) ? preg_replace('/\D/', '', $data['cep']) : null,
+            'city_id' => $city?->id,
+            'state_id' => $state?->id,
+        ];
+
+        if (array_filter($attributes) === []) {
+            return; // sem nenhum dado de endereço na linha — não cria registro vazio
+        }
+
+        $company->address()->updateOrCreate([], $attributes);
     }
 
     private function recordHistorySnapshots(Company $company, ImportBatch $batch, ?array $previous): void

@@ -21,11 +21,18 @@ afterEach(function () {
 
 function createLeadForScoringTest(array $companyAttributes = []): Lead
 {
+    $stateId = $companyAttributes['state_id'] ?? null;
+    unset($companyAttributes['state_id']);
+
     $company = Company::create([
         'cnpj' => (string) random_int(10000000000000, 99999999999999),
         'razao_social' => 'Empresa Scoring Test',
         ...$companyAttributes,
     ]);
+
+    if ($stateId !== null) {
+        $company->address()->create(['state_id' => $stateId]);
+    }
 
     return Lead::create(['company_id' => $company->id, 'stage' => LeadStage::New->value]);
 }

@@ -2,6 +2,7 @@
 
 namespace App\DomainServices;
 
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -19,11 +20,17 @@ class GooglePlacesClient
 {
     private const BASE_URL = 'https://places.googleapis.com/v1';
 
-    private const DETAILS_FIELD_MASK = 'id,rating,userRatingCount,primaryType,regularOpeningHours,businessStatus,websiteUri';
+    private const DETAILS_FIELD_MASK = 'id,location,rating,userRatingCount,primaryType,regularOpeningHours,businessStatus,websiteUri';
 
     public function isConfigured(): bool
     {
-        return filled(config('services.google_places.key'));
+        return filled($this->apiKey());
+    }
+
+    /** Chave gerenciável via tela Admin/Configurações (`Setting`), com fallback para `.env`. */
+    private function apiKey(): ?string
+    {
+        return Setting::get('integrations.google_places_api_key') ?: config('services.google_places.key');
     }
 
     /** Text Search — resolve um place_id a partir de nome+endereço livre. */
@@ -35,7 +42,7 @@ class GooglePlacesClient
 
         try {
             $response = Http::withHeaders([
-                'X-Goog-Api-Key' => config('services.google_places.key'),
+                'X-Goog-Api-Key' => $this->apiKey(),
                 'X-Goog-FieldMask' => 'places.id',
             ])
                 ->timeout(5)
@@ -58,7 +65,7 @@ class GooglePlacesClient
 
         try {
             $response = Http::withHeaders([
-                'X-Goog-Api-Key' => config('services.google_places.key'),
+                'X-Goog-Api-Key' => $this->apiKey(),
                 'X-Goog-FieldMask' => self::DETAILS_FIELD_MASK,
             ])
                 ->timeout(5)

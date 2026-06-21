@@ -49,6 +49,16 @@ class HandleInertiaRequests extends Middleware
             'theme' => [
                 'primary' => Setting::get('theme.primary_color', '#4F46E5'),
                 'secondary' => Setting::get('theme.secondary_color', '#06B6D4'),
+                'stageColors' => Setting::get('kanban.stage_colors', [
+                    'new' => '#3B82F6',
+                    'attempting_contact' => '#F59E0B',
+                    'contact_made' => '#8B5CF6',
+                    'qualified' => '#0EA5E9',
+                    'proposal_sent' => '#EC4899',
+                    'negotiation' => '#F97316',
+                    'won' => '#10B981',
+                    'lost' => '#EF4444',
+                ]),
             ],
         ];
     }

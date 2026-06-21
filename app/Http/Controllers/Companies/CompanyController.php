@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Companies;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateCompanyAddressRequest;
 use App\Models\Company;
 use App\Models\State;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -29,8 +31,8 @@ class CompanyController extends Controller
 
         $query = Company::query()
             ->with([
-                'city:id,name',
-                'state:id,uf',
+                'address.city:id,name',
+                'address.state:id,uf',
                 'contacts',
                 'leads:id,company_id,stage,assigned_to,created_at',
                 'leads.assignedTo:id,name',
@@ -51,11 +53,11 @@ class CompanyController extends Controller
         }
 
         if (filled($stateId)) {
-            $query->where('state_id', $stateId);
+            $query->whereHas('address', fn ($q) => $q->where('state_id', $stateId));
         }
 
         if ($city !== '') {
-            $query->whereHas('city', fn ($q) => $q->where('name', 'like', "%{$city}%"));
+            $query->whereHas('address.city', fn ($q) => $q->where('name', 'like', "%{$city}%"));
         }
 
         if (filled($assignedTo)) {
@@ -89,5 +91,19 @@ class CompanyController extends Controller
             'states' => State::query()->select('id', 'uf')->orderBy('uf')->get(),
             'consultants' => User::query()->where('role', UserRole::Consultant->value)->select('id', 'name')->get(),
         ]);
+    }
+
+    /**
+     * Endereço é dado cadastral da Company (não do Lead) — editável a partir do Kanban (aba
+     * Mapa) para permitir completar o endereço antes de buscar a localização via Google Places,
+     * mas a regra de RBAC é a mesma de qualquer outra edição de Company (admin/manager).
+     */
+    public function updateAddress(UpdateCompanyAddressRequest $request, Company $company): RedirectResponse
+    {
+        Gate::authorize('update', $company);
+
+        $company->address()->updateOrCreate([], $request->validated());
+
+        return back()->with('status', 'Endereço atualizado com sucesso.');
     }
 }

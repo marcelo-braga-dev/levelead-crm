@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'cnpj', 'razao_social', 'nome_fantasia',
-    'address_type', 'logradouro', 'numero', 'complemento', 'bairro', 'city_id', 'state_id', 'cep',
     'matriz_filial', 'ente_federativo',
     'primary_cnae_id', 'legal_nature_id',
     'data_inicio_atividade', 'company_size',
@@ -47,14 +46,9 @@ class Company extends Model
         ];
     }
 
-    public function city(): BelongsTo
+    public function address(): HasOne
     {
-        return $this->belongsTo(City::class);
-    }
-
-    public function state(): BelongsTo
-    {
-        return $this->belongsTo(State::class);
+        return $this->hasOne(Address::class);
     }
 
     public function primaryCnae(): BelongsTo

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\DomainServices\AuditLogReconstructor;
 use App\Http\Controllers\Controller;
+use App\Models\Address;
 use App\Models\AuditLog;
 use App\Models\Company;
 use App\Models\FollowUp;
@@ -27,6 +28,7 @@ class AuditController extends Controller
     private const ENTITY_SLUGS = [
         'lead' => Lead::class,
         'company' => Company::class,
+        'address' => Address::class,
         'proposal' => Proposal::class,
         'follow_up' => FollowUp::class,
     ];

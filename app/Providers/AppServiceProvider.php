@@ -34,5 +34,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Não há model/instância envolvida (Setting é key-value genérico) — ability solta em vez de Policy.
         Gate::define('manage-appearance', fn (User $user) => $user->role === UserRole::Admin);
+        Gate::define('manage-settings', fn (User $user) => $user->role === UserRole::Admin);
     }
 }

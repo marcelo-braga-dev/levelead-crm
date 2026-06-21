@@ -82,7 +82,7 @@ class LeadDistributionService
     /** @return Collection<int, User> */
     private function poolByGeography(LeadDistributionRule $rule, Lead $lead, bool $exactState): Collection
     {
-        $leadStateId = $lead->company?->state_id;
+        $leadStateId = $lead->company?->address?->state_id;
 
         if (! $leadStateId || ! $rule->state_id) {
             return collect();

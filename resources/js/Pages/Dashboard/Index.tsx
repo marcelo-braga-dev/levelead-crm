@@ -127,8 +127,8 @@ export default function DashboardIndex({
     const percent = (value: number | null) => (value === null ? '—' : `${(value * 100).toFixed(1)}%`);
 
     return (
-        <MuiAuthenticatedLayout title="Dashboard">
-            <Head title="Dashboard" />
+        <MuiAuthenticatedLayout title="Painel">
+            <Head title="Painel" />
 
             <Stack direction="row" spacing={2} sx={{ mb: 3, flexWrap: 'wrap' }}>
                 <TextField

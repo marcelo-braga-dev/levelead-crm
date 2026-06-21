@@ -6,6 +6,7 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
+    Grid,
     MenuItem,
     Paper,
     Stack,
@@ -45,7 +46,7 @@ interface ScoringRuleRow {
 
 const strategyLabels: Record<string, string> = {
     manual: 'Manual',
-    round_robin: 'Round robin global',
+    round_robin: 'Rodízio global',
     by_team: 'Por equipe',
     by_region: 'Por região',
     by_state: 'Por estado',
@@ -187,7 +188,7 @@ export default function RulesIndex({
 
             <Tabs value={tab} onChange={(_e: SyntheticEvent, value: number) => setTab(value)} sx={{ mb: 2 }}>
                 <Tab label="Distribuição" />
-                <Tab label="Scoring" />
+                <Tab label="Pontuação" />
             </Tabs>
 
             {tab === 0 && (
@@ -290,7 +291,7 @@ export default function RulesIndex({
                                 {scoringRules.length === 0 && (
                                     <TableRow>
                                         <TableCell colSpan={5} align="center">
-                                            Nenhuma regra de scoring cadastrada.
+                                            Nenhuma regra de pontuação cadastrada.
                                         </TableCell>
                                     </TableRow>
                                 )}
@@ -300,83 +301,101 @@ export default function RulesIndex({
                 </>
             )}
 
-            <Dialog open={editingDistribution !== null} onClose={() => setEditingDistribution(null)} maxWidth="sm" fullWidth>
+            <Dialog open={editingDistribution !== null} onClose={() => setEditingDistribution(null)} maxWidth="md" fullWidth>
                 <DialogTitle>{editingDistribution === 'new' ? 'Nova regra de distribuição' : 'Editar regra de distribuição'}</DialogTitle>
                 <DialogContent>
-                    <Stack spacing={2} sx={{ mt: 1 }}>
-                        <TextField
-                            label="Nome"
-                            size="small"
-                            value={distributionForm.data.name}
-                            onChange={(e) => distributionForm.setData('name', e.target.value)}
-                            error={Boolean(distributionForm.errors.name)}
-                            helperText={distributionForm.errors.name}
-                        />
-                        <TextField
-                            select
-                            label="Estratégia"
-                            size="small"
-                            value={distributionForm.data.strategy}
-                            onChange={(e) => distributionForm.setData('strategy', e.target.value)}
-                        >
-                            {Object.entries(strategyLabels).map(([value, label]) => (
-                                <MenuItem key={value} value={value}>
-                                    {label}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            select
-                            label="Equipe (para 'Por equipe')"
-                            size="small"
-                            value={distributionForm.data.team_id}
-                            onChange={(e) => distributionForm.setData('team_id', e.target.value)}
-                        >
-                            <MenuItem value="">Nenhuma</MenuItem>
-                            {teams.map((team) => (
-                                <MenuItem key={team.id} value={team.id}>
-                                    {team.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            select
-                            label="Estado (para 'Por estado')"
-                            size="small"
-                            value={distributionForm.data.state_id}
-                            onChange={(e) => distributionForm.setData('state_id', e.target.value)}
-                        >
-                            <MenuItem value="">Nenhum</MenuItem>
-                            {states.map((state) => (
-                                <MenuItem key={state.id} value={state.id}>
-                                    {state.uf}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            select
-                            label="Produto (para 'Por produto')"
-                            size="small"
-                            value={distributionForm.data.product_id}
-                            onChange={(e) => distributionForm.setData('product_id', e.target.value)}
-                        >
-                            <MenuItem value="">Nenhum</MenuItem>
-                            {products.map((product) => (
-                                <MenuItem key={product.id} value={product.id}>
-                                    {product.name}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                        <TextField
-                            label="Prioridade (maior = avaliada primeiro)"
-                            type="number"
-                            size="small"
-                            value={distributionForm.data.priority}
-                            onChange={(e) => distributionForm.setData('priority', e.target.value)}
-                            error={Boolean(distributionForm.errors.priority)}
-                            helperText={distributionForm.errors.priority}
-                        />
-                    </Stack>
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField
+                                label="Nome"
+                                size="small"
+                                fullWidth
+                                value={distributionForm.data.name}
+                                onChange={(e) => distributionForm.setData('name', e.target.value)}
+                                error={Boolean(distributionForm.errors.name)}
+                                helperText={distributionForm.errors.name}
+                            />
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField
+                                select
+                                label="Estratégia"
+                                size="small"
+                                fullWidth
+                                value={distributionForm.data.strategy}
+                                onChange={(e) => distributionForm.setData('strategy', e.target.value)}
+                            >
+                                {Object.entries(strategyLabels).map(([value, label]) => (
+                                    <MenuItem key={value} value={value}>
+                                        {label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField
+                                select
+                                label="Equipe (para 'Por equipe')"
+                                size="small"
+                                fullWidth
+                                value={distributionForm.data.team_id}
+                                onChange={(e) => distributionForm.setData('team_id', e.target.value)}
+                            >
+                                <MenuItem value="">Nenhuma</MenuItem>
+                                {teams.map((team) => (
+                                    <MenuItem key={team.id} value={team.id}>
+                                        {team.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField
+                                select
+                                label="Estado (para 'Por estado')"
+                                size="small"
+                                fullWidth
+                                value={distributionForm.data.state_id}
+                                onChange={(e) => distributionForm.setData('state_id', e.target.value)}
+                            >
+                                <MenuItem value="">Nenhum</MenuItem>
+                                {states.map((state) => (
+                                    <MenuItem key={state.id} value={state.id}>
+                                        {state.uf}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField
+                                select
+                                label="Produto (para 'Por produto')"
+                                size="small"
+                                fullWidth
+                                value={distributionForm.data.product_id}
+                                onChange={(e) => distributionForm.setData('product_id', e.target.value)}
+                            >
+                                <MenuItem value="">Nenhum</MenuItem>
+                                {products.map((product) => (
+                                    <MenuItem key={product.id} value={product.id}>
+                                        {product.name}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <TextField
+                                label="Prioridade (maior = avaliada primeiro)"
+                                type="number"
+                                size="small"
+                                fullWidth
+                                value={distributionForm.data.priority}
+                                onChange={(e) => distributionForm.setData('priority', e.target.value)}
+                                error={Boolean(distributionForm.errors.priority)}
+                                helperText={distributionForm.errors.priority}
+                            />
+                        </Grid>
+                    </Grid>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setEditingDistribution(null)}>Cancelar</Button>
@@ -387,7 +406,7 @@ export default function RulesIndex({
             </Dialog>
 
             <Dialog open={editingScoring !== null} onClose={() => setEditingScoring(null)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingScoring === 'new' ? 'Nova regra de scoring' : 'Editar regra de scoring'}</DialogTitle>
+                <DialogTitle>{editingScoring === 'new' ? 'Nova regra de pontuação' : 'Editar regra de pontuação'}</DialogTitle>
                 <DialogContent>
                     <Stack spacing={2} sx={{ mt: 1 }}>
                         <Typography variant="caption" color="text.secondary">

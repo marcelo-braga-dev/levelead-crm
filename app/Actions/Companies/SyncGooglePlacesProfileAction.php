@@ -39,8 +39,7 @@ class SyncGooglePlacesProfileAction
         $placeId = $company->placesProfile?->google_place_id;
 
         if ($placeId === null) {
-            $query = trim("{$company->razao_social} {$company->logradouro} {$company->bairro}");
-            $placeId = $this->client->findPlaceId($query);
+            $placeId = $this->client->findPlaceId($this->buildSearchQuery($company));
         }
 
         if ($placeId === null) {
@@ -57,6 +56,8 @@ class SyncGooglePlacesProfileAction
             ['company_id' => $company->id],
             [
                 'google_place_id' => $placeId,
+                'latitude' => $details['location']['latitude'] ?? null,
+                'longitude' => $details['location']['longitude'] ?? null,
                 'rating' => $details['rating'] ?? null,
                 'user_rating_count' => $details['userRatingCount'] ?? null,
                 'primary_type' => $details['primaryType'] ?? null,
@@ -68,6 +69,26 @@ class SyncGooglePlacesProfileAction
         );
 
         return ['result' => self::RESULT_SYNCED, 'profile' => $profile];
+    }
+
+    /**
+     * Usa o endereço completo (logradouro, número, bairro, cidade, UF) quando disponível —
+     * muito mais preciso para a Text Search encontrar o local certo do que só nome+rua, que era
+     * o comportamento original (e falhava sempre que havia mais de uma empresa na mesma rua).
+     */
+    private function buildSearchQuery(Company $company): string
+    {
+        $address = $company->address;
+
+        $addressParts = array_filter([
+            $address?->logradouro,
+            $address?->numero,
+            $address?->bairro,
+            $address?->city?->name,
+            $address?->state?->uf,
+        ]);
+
+        return implode(', ', [$company->razao_social, ...$addressParts]);
     }
 
     /** @return bool false quando o orçamento mensal já foi consumido */

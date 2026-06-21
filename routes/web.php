@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DistributionRuleController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\RuleController;
 use App\Http\Controllers\Admin\ScoringRuleController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\Kanban\LeadController;
 use App\Http\Controllers\Kanban\LeadInteractionController;
 use App\Http\Controllers\Kanban\LeadStageController;
 use App\Http\Controllers\Kanban\ProposalController;
+use App\Http\Controllers\LookupController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
 
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+    Route::patch('/companies/{company}/address', [CompanyController::class, 'updateAddress'])->name('companies.address.update');
     Route::post('/companies/{company}/places-profile', [GooglePlacesProfileController::class, 'store'])->name('companies.places-profile.store');
+
+    Route::get('/lookups/cities', [LookupController::class, 'cities'])->name('lookups.cities');
 
     Route::get('/companies/import', [ImportController::class, 'create'])->name('companies.import');
     Route::post('/companies/import', [ImportController::class, 'store'])->name('companies.import.store');
@@ -71,6 +76,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/admin/appearance', [AppearanceController::class, 'edit'])->name('admin.appearance.edit');
     Route::put('/admin/appearance', [AppearanceController::class, 'update'])->name('admin.appearance.update');
+
+    Route::get('/admin/settings', [SettingsController::class, 'edit'])->name('admin.settings.edit');
+    Route::put('/admin/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
 
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');

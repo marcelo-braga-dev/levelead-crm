@@ -94,8 +94,8 @@ export default function InteractionsSection({
                         value={form.data.direction}
                         onChange={(e) => form.setData('direction', e.target.value)}
                     >
-                        <MenuItem value="outbound">Realizada (outbound)</MenuItem>
-                        <MenuItem value="inbound">Recebida (inbound)</MenuItem>
+                        <MenuItem value="outbound">{directionLabels.outbound}</MenuItem>
+                        <MenuItem value="inbound">{directionLabels.inbound}</MenuItem>
                     </Select>
                 )}
 

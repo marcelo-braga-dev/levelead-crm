@@ -1,9 +1,11 @@
 import FollowUpsSection from '@/Pages/Kanban/Partials/FollowUpsSection';
 import GooglePlacesCard from '@/Pages/Kanban/Partials/GooglePlacesCard';
 import InteractionsSection from '@/Pages/Kanban/Partials/InteractionsSection';
+import MapSection from '@/Pages/Kanban/Partials/MapSection';
 import ProposalsSection from '@/Pages/Kanban/Partials/ProposalsSection';
 import { ConsultantOption, GooglePlacesBadgeThresholds } from '@/Pages/Kanban/Board';
 import { LeadCardData, PageProps } from '@/types';
+import { topAlignedDialogSlotProps } from '@/utils/dialog';
 import { leadStageLabels, LeadStageValue } from '@/utils/leadStage';
 import { router, usePage, useForm } from '@inertiajs/react';
 import {
@@ -13,6 +15,7 @@ import {
     DialogContent,
     DialogTitle,
     Divider,
+    Grid,
     MenuItem,
     Select,
     Stack,
@@ -30,6 +33,7 @@ export default function LeadDetailDialog({
     consultants,
     googlePlacesBadgeThresholds,
     products,
+    states,
 }: {
     lead: LeadCardData | null;
     open: boolean;
@@ -37,6 +41,7 @@ export default function LeadDetailDialog({
     consultants: ConsultantOption[];
     googlePlacesBadgeThresholds: GooglePlacesBadgeThresholds;
     products: { id: number; name: string }[];
+    states: { id: number; uf: string }[];
 }) {
     const { auth } = usePage<PageProps>().props;
     const canAssign = auth.user.role === 'admin' || auth.user.role === 'manager';
@@ -75,13 +80,21 @@ export default function LeadDetailDialog({
     }
 
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth slotProps={topAlignedDialogSlotProps}>
             <DialogTitle>{lead.company.razao_social}</DialogTitle>
-            <Tabs value={tab} onChange={handleTabChange} sx={{ px: 3 }}>
+            <Tabs
+                value={tab}
+                onChange={handleTabChange}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                sx={{ px: 3 }}
+            >
                 <Tab label="Dados" />
                 <Tab label={`Interações (${lead.interactions.length})`} />
                 <Tab label={`Propostas (${lead.proposals.length})`} />
                 <Tab label={`Follow-ups (${lead.follow_ups.length})`} />
+                <Tab label="Mapa" />
             </Tabs>
             <DialogContent>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
@@ -117,50 +130,73 @@ export default function LeadDetailDialog({
                                 ))}
                             </Select>
                         )}
-                        <TextField
-                            label="Nome do contato"
-                            size="small"
-                            value={form.data.contact_name}
-                            onChange={(e) => form.setData('contact_name', e.target.value)}
-                        />
-                        <TextField
-                            label="Telefone"
-                            size="small"
-                            value={form.data.contact_phone}
-                            onChange={(e) => form.setData('contact_phone', e.target.value)}
-                        />
-                        <TextField
-                            label="WhatsApp"
-                            size="small"
-                            value={form.data.contact_whatsapp}
-                            onChange={(e) => form.setData('contact_whatsapp', e.target.value)}
-                        />
-                        <TextField
-                            label="E-mail"
-                            size="small"
-                            value={form.data.contact_email}
-                            onChange={(e) => form.setData('contact_email', e.target.value)}
-                        />
-                        <TextField
-                            label="Nível de interesse"
-                            size="small"
-                            value={form.data.interest_level}
-                            onChange={(e) => form.setData('interest_level', e.target.value)}
-                        />
-                        <TextField
-                            label="Potencial de compra"
-                            size="small"
-                            value={form.data.purchase_potential}
-                            onChange={(e) => form.setData('purchase_potential', e.target.value)}
-                        />
-                        <TextField
-                            label="Notas de qualificação"
-                            size="small"
-                            multiline
-                            minRows={2}
-                            value={form.data.qualification_notes}
-                            onChange={(e) => form.setData('qualification_notes', e.target.value)}
-                        />
+                        <Grid container spacing={2}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    label="Nome do contato"
+                                    size="small"
+                                    fullWidth
+                                    value={form.data.contact_name}
+                                    onChange={(e) => form.setData('contact_name', e.target.value)}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    label="E-mail"
+                                    size="small"
+                                    fullWidth
+                                    value={form.data.contact_email}
+                                    onChange={(e) => form.setData('contact_email', e.target.value)}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    label="Telefone"
+                                    size="small"
+                                    fullWidth
+                                    value={form.data.contact_phone}
+                                    onChange={(e) => form.setData('contact_phone', e.target.value)}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    label="WhatsApp"
+                                    size="small"
+                                    fullWidth
+                                    value={form.data.contact_whatsapp}
+                                    onChange={(e) => form.setData('contact_whatsapp', e.target.value)}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    label="Nível de interesse"
+                                    size="small"
+                                    fullWidth
+                                    value={form.data.interest_level}
+                                    onChange={(e) => form.setData('interest_level', e.target.value)}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                                <TextField
+                                    label="Potencial de compra"
+                                    size="small"
+                                    fullWidth
+                                    value={form.data.purchase_potential}
+                                    onChange={(e) => form.setData('purchase_potential', e.target.value)}
+                                />
+                            </Grid>
+                            <Grid size={12}>
+                                <TextField
+                                    label="Notas de qualificação"
+                                    size="small"
+                                    fullWidth
+                                    multiline
+                                    minRows={2}
+                                    value={form.data.qualification_notes}
+                                    onChange={(e) => form.setData('qualification_notes', e.target.value)}
+                                />
+                            </Grid>
+                        </Grid>
                     </Stack>
                 )}
 
@@ -169,6 +205,17 @@ export default function LeadDetailDialog({
                 {tab === 2 && <ProposalsSection leadId={lead.id} proposals={lead.proposals} products={products} />}
 
                 {tab === 3 && <FollowUpsSection leadId={lead.id} followUps={lead.follow_ups} />}
+
+                {tab === 4 && (
+                    <MapSection
+                        companyId={lead.company.id}
+                        razaoSocial={lead.company.razao_social}
+                        address={lead.company.address}
+                        placesProfile={lead.company.places_profile}
+                        states={states}
+                        canEditAddress={canAssign}
+                    />
+                )}
             </DialogContent>
             <Divider />
             <DialogActions sx={{ justifyContent: 'space-between', px: 3 }}>

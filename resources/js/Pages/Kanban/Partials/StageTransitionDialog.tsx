@@ -1,3 +1,4 @@
+import { topAlignedDialogSlotProps } from '@/utils/dialog';
 import { leadStageLabels, LeadStageValue } from '@/utils/leadStage';
 import { useForm } from '@inertiajs/react';
 import {
@@ -51,7 +52,7 @@ export default function StageTransitionDialog({
     }
 
     return (
-        <Dialog open onClose={onClose} maxWidth="sm" fullWidth>
+        <Dialog open onClose={onClose} maxWidth="sm" fullWidth slotProps={topAlignedDialogSlotProps}>
             <DialogTitle>Mover para {leadStageLabels[toStage]}</DialogTitle>
             <DialogContent>
                 <Stack spacing={2} sx={{ mt: 1 }}>

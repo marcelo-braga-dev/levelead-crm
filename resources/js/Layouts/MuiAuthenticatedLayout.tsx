@@ -12,6 +12,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import PaletteIcon from '@mui/icons-material/Palette';
 import RuleIcon from '@mui/icons-material/Rule';
+import SettingsIcon from '@mui/icons-material/Settings';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 import PeopleIcon from '@mui/icons-material/People';
@@ -41,9 +42,9 @@ import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 const drawerWidth = 250;
 
 const navItems = [
-    { label: 'Dashboard', route: 'dashboard', icon: <DashboardIcon /> },
+    { label: 'Painel', route: 'dashboard', icon: <DashboardIcon /> },
     { label: 'Kanban', route: 'kanban.board', icon: <ViewKanbanIcon /> },
-    { label: 'Companies', route: 'companies.index', icon: <BusinessIcon /> },
+    { label: 'Empresas', route: 'companies.index', icon: <BusinessIcon /> },
     { label: 'Importar CSV', route: 'companies.import', icon: <UploadFileIcon /> },
 ];
 
@@ -57,6 +58,7 @@ const adminOnlyNavItems = [
     { label: 'Usuários', route: 'admin.users.index', icon: <PeopleIcon /> },
     { label: 'Equipes', route: 'admin.teams.index', icon: <GroupsIcon /> },
     { label: 'Regras', route: 'admin.rules.index', icon: <RuleIcon /> },
+    { label: 'Configurações', route: 'admin.settings.edit', icon: <SettingsIcon /> },
 ];
 
 export default function MuiAuthenticatedLayout({
@@ -84,25 +86,34 @@ export default function MuiAuthenticatedLayout({
 
     return (
         <Box sx={{ display: 'flex' }}>
-            <AppBar position="fixed" color="default" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+            <AppBar
+                position="fixed"
+                sx={{
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    backgroundImage: (theme) =>
+                        `linear-gradient(115deg, ${theme.palette.primary.dark ?? theme.palette.primary.main} 0%, ${theme.palette.primary.main} 55%, ${theme.palette.secondary.main} 130%)`,
+                    color: '#fff',
+                    boxShadow: (theme) => `0 4px 20px -6px ${theme.palette.primary.main}66`,
+                }}
+            >
                 <Toolbar sx={{ gap: 1.5 }}>
                     <Typography variant="h6" noWrap sx={{ flexGrow: 1, fontWeight: 700 }}>
                         {title ?? 'LeveLead CRM'}
                     </Typography>
 
-                    <Typography variant="body2" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                    <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' }, opacity: 0.85 }}>
                         {user.name}
                     </Typography>
 
                     <Tooltip title={mode === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}>
-                        <IconButton onClick={toggleMode}>
+                        <IconButton onClick={toggleMode} sx={{ color: 'inherit' }}>
                             {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
                         </IconButton>
                     </Tooltip>
 
                     {canSeeManagerNav && (
                         <>
-                            <IconButton onClick={(event) => setNotificationsAnchorEl(event.currentTarget)}>
+                            <IconButton onClick={(event) => setNotificationsAnchorEl(event.currentTarget)} sx={{ color: 'inherit' }}>
                                 <Badge badgeContent={unreadNotifications.length} color="error">
                                     <NotificationsIcon />
                                 </Badge>
@@ -130,11 +141,13 @@ export default function MuiAuthenticatedLayout({
 
                     <Avatar
                         sx={{
-                            width: 32,
-                            height: 32,
+                            width: 34,
+                            height: 34,
                             cursor: 'pointer',
-                            bgcolor: 'primary.main',
+                            bgcolor: 'rgba(255,255,255,0.18)',
+                            border: '1.5px solid rgba(255,255,255,0.55)',
                             fontSize: '0.9rem',
+                            fontWeight: 700,
                         }}
                         onClick={(event) => setAnchorEl(event.currentTarget)}
                     >
@@ -145,7 +158,7 @@ export default function MuiAuthenticatedLayout({
                         <MenuItem component={Link} href={route('profile.edit')}>
                             Perfil
                         </MenuItem>
-                        <MenuItem component={Link} href={route('logout')} method="post" as="button">
+                        <MenuItem onClick={() => router.post(route('logout'))}>
                             <ListItemIcon>
                                 <LogoutIcon fontSize="small" />
                             </ListItemIcon>
@@ -167,15 +180,17 @@ export default function MuiAuthenticatedLayout({
                 <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', px: 2.5, py: 2.5 }}>
                     <Box
                         sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: 2,
-                            bgcolor: 'primary.main',
-                            color: 'primary.contrastText',
+                            width: 38,
+                            height: 38,
+                            borderRadius: 2.5,
+                            backgroundImage: (theme) =>
+                                `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                            color: '#fff',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontWeight: 700,
+                            boxShadow: (theme) => `0 6px 14px -4px ${theme.palette.primary.main}80`,
                         }}
                     >
                         L

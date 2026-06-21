@@ -110,7 +110,7 @@ class LeadScoringService
         return match ($rule->criterion) {
             'company_size' => $company->company_size === $rule->criterion_value,
             'tax_regime' => $company->tax_regime === $rule->criterion_value,
-            'state' => $company->state?->uf === $rule->criterion_value,
+            'state' => $company->address?->state?->uf === $rule->criterion_value,
             'cnae' => $company->primaryCnae?->code === $rule->criterion_value,
             'revenue_range' => $this->matchesRevenueRange($rule->criterion_value, $company->estimated_revenue_value),
             'has_google_profile' => $company->placesProfile !== null,

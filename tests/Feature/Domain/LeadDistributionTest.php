@@ -19,8 +19,11 @@ function createLeadForDistributionTest(?int $stateId = null): Lead
     $company = Company::create([
         'cnpj' => (string) random_int(10000000000000, 99999999999999),
         'razao_social' => 'Empresa Distribution Test',
-        'state_id' => $stateId,
     ]);
+
+    if ($stateId !== null) {
+        $company->address()->create(['state_id' => $stateId]);
+    }
 
     return Lead::create(['company_id' => $company->id, 'stage' => LeadStage::New->value]);
 }

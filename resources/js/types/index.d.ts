@@ -67,12 +67,24 @@ export interface LeadInteractionEntry {
 // Perfil enriquecido via Google Places API (New) — nunca a Business Profile API, que só
 // daria acesso a perfis que a própria empresa verificou (ver GooglePlacesClient).
 export interface CompanyPlacesProfile {
+    latitude: string | null;
+    longitude: string | null;
     rating: string | null;
     user_rating_count: number | null;
     primary_type: string | null;
     business_status: 'OPERATIONAL' | 'CLOSED_TEMPORARILY' | 'CLOSED_PERMANENTLY' | null;
     has_website: boolean;
     synced_at: string | null;
+}
+
+export interface CompanyAddress {
+    logradouro: string | null;
+    numero: string | null;
+    complemento: string | null;
+    bairro: string | null;
+    cep: string | null;
+    city: { id: number; name: string } | null;
+    state: { id: number; uf: string } | null;
 }
 
 export interface LeadCardData {
@@ -91,6 +103,7 @@ export interface LeadCardData {
         razao_social: string;
         nome_fantasia: string | null;
         site: string | null;
+        address: CompanyAddress | null;
         places_profile: CompanyPlacesProfile | null;
     };
     assigned_to: { id: number; name: string } | null;
@@ -117,5 +130,6 @@ export type PageProps<
     theme: {
         primary: string;
         secondary: string;
+        stageColors: Record<string, string>;
     };
 };

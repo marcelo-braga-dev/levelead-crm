@@ -78,8 +78,8 @@ export default function CompaniesIndex({
     }
 
     return (
-        <MuiAuthenticatedLayout title="Companies">
-            <Head title="Companies" />
+        <MuiAuthenticatedLayout title="Empresas">
+            <Head title="Empresas" />
 
             <Stack direction="row" spacing={2} sx={{ mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                 <TextField
@@ -192,7 +192,9 @@ export default function CompaniesIndex({
                                 <TableCell>{company.razao_social}</TableCell>
                                 <TableCell>{company.cnpj}</TableCell>
                                 <TableCell>
-                                    {company.city ? `${company.city.name}/${company.state?.uf}` : '—'}
+                                    {company.address?.city
+                                        ? `${company.address.city.name}/${company.address.state?.uf}`
+                                        : '—'}
                                 </TableCell>
                                 <TableCell>{leadStatusChip(company)}</TableCell>
                             </TableRow>
@@ -200,7 +202,7 @@ export default function CompaniesIndex({
                         {companies.data.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={4} align="center">
-                                    Nenhuma company encontrada. <Link href={route('companies.import')}>Importar CSV</Link>
+                                    Nenhuma empresa encontrada. <Link href={route('companies.import')}>Importar CSV</Link>
                                 </TableCell>
                             </TableRow>
                         )}

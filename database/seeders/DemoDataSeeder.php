@@ -197,7 +197,17 @@ class DemoDataSeeder extends Seeder
     /** @param array<string, mixed> $attributes */
     private function makeCompany(string $cnpj, array $attributes): Company
     {
-        return Company::query()->updateOrCreate(['cnpj' => $cnpj], $attributes);
+        $addressKeys = ['state_id', 'city_id', 'logradouro', 'numero', 'complemento', 'bairro', 'cep'];
+        $addressAttributes = array_intersect_key($attributes, array_flip($addressKeys));
+        $companyAttributes = array_diff_key($attributes, array_flip($addressKeys));
+
+        $company = Company::query()->updateOrCreate(['cnpj' => $cnpj], $companyAttributes);
+
+        if (array_filter($addressAttributes) !== []) {
+            $company->address()->updateOrCreate([], $addressAttributes);
+        }
+
+        return $company;
     }
 
     private function cnaeId(string $code): ?int

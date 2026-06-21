@@ -10,11 +10,19 @@ use App\Models\User;
 
 function makeCompanyWithLead(array $companyAttributes, array $leadAttributes = []): Company
 {
+    $stateId = $companyAttributes['state_id'] ?? null;
+    $cityId = $companyAttributes['city_id'] ?? null;
+    unset($companyAttributes['state_id'], $companyAttributes['city_id']);
+
     $company = Company::create([
         'cnpj' => (string) random_int(10000000000000, 99999999999999),
         'razao_social' => 'Empresa Filtro '.uniqid(),
         ...$companyAttributes,
     ]);
+
+    if ($stateId !== null || $cityId !== null) {
+        $company->address()->create(['state_id' => $stateId, 'city_id' => $cityId]);
+    }
 
     Lead::create([
         'company_id' => $company->id,

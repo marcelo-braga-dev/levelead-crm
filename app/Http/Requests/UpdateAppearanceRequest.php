@@ -11,6 +11,8 @@ class UpdateAppearanceRequest extends FormRequest
         return [
             'primary_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'secondary_color' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'stage_colors' => ['required', 'array'],
+            'stage_colors.*' => ['required', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ];
     }
 }

@@ -13,7 +13,7 @@ import {
     useSensors,
 } from '@dnd-kit/core';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Box, Button, MenuItem, Paper, Snackbar, Stack, TextField, Typography } from '@mui/material';
+import { alpha, Box, Button, Chip, MenuItem, Paper, Snackbar, Stack, TextField, Typography } from '@mui/material';
 import { ReactNode, useState } from 'react';
 
 export interface ConsultantOption {
@@ -29,20 +29,31 @@ interface KanbanColumn {
     total: number;
 }
 
-function DroppableColumn({ stage, children }: { stage: LeadStageValue; children: ReactNode }) {
+function DroppableColumn({
+    stage,
+    color,
+    children,
+}: {
+    stage: LeadStageValue;
+    color: string;
+    children: ReactNode;
+}) {
     const { setNodeRef, isOver } = useDroppable({ id: stage });
 
     return (
         <Paper
             ref={setNodeRef}
-            variant="outlined"
             sx={{
-                minWidth: 260,
-                maxWidth: 260,
+                minWidth: 272,
+                maxWidth: 272,
                 flexShrink: 0,
-                p: 1.5,
-                bgcolor: isOver ? 'action.hover' : 'background.paper',
-                borderColor: isOver ? 'primary.main' : 'divider',
+                p: 1.25,
+                border: '1px solid',
+                borderColor: isOver ? color : 'divider',
+                borderTopWidth: 3,
+                borderTopColor: color,
+                bgcolor: isOver ? (theme) => alpha(color, theme.palette.mode === 'light' ? 0.08 : 0.14) : 'background.paper',
+                transition: 'background-color 0.15s ease, border-color 0.15s ease',
             }}
         >
             {children}
@@ -60,15 +71,17 @@ export default function KanbanBoard({
     products,
     consultants,
     loaded,
+    states,
     googlePlacesBadgeThresholds,
 }: {
     columns: KanbanColumn[];
     products: { id: number; name: string }[];
     consultants: ConsultantOption[];
     loaded: Record<string, number>;
+    states: { id: number; uf: string }[];
     googlePlacesBadgeThresholds: GooglePlacesBadgeThresholds;
 }) {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, theme } = usePage<PageProps>().props;
     const canDistribute = auth.user.role === 'admin' || auth.user.role === 'manager';
     const [selectedId, setSelectedId] = useState<number | null>(null);
     const [pendingTransition, setPendingTransition] = useState<{
@@ -243,43 +256,62 @@ export default function KanbanBoard({
 
             <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                 <Stack direction="row" spacing={2} sx={{ overflowX: 'auto', pb: 2 }}>
-                    {columns.map((column) => (
-                        <DroppableColumn key={column.stage} stage={column.stage}>
-                            <Typography variant="subtitle2" gutterBottom>
-                                {column.label} ({column.total})
-                            </Typography>
+                    {columns.map((column) => {
+                        const color = theme.stageColors[column.stage] ?? '#9CA3AF';
 
-                            {column.leads.map((lead) => (
-                                <LeadCard
-                                    key={lead.id}
-                                    lead={lead}
-                                    onClick={() => setSelectedId(lead.id)}
-                                    selectable={selectionMode}
-                                    selected={selectedLeadIds.includes(lead.id)}
-                                    onToggleSelect={() => toggleLeadSelected(lead.id)}
-                                />
-                            ))}
-
-                            {column.leads.length === 0 && (
-                                <Box sx={{ py: 2, textAlign: 'center' }}>
-                                    <Typography variant="caption" color="text.secondary">
-                                        Nenhum lead
+                        return (
+                            <DroppableColumn key={column.stage} stage={column.stage} color={color}>
+                                <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 1, px: 0.25 }}>
+                                    <Typography variant="subtitle2" sx={{ flexGrow: 1 }} noWrap>
+                                        {column.label}
                                     </Typography>
-                                </Box>
-                            )}
+                                    <Chip
+                                        label={column.total}
+                                        size="small"
+                                        sx={{
+                                            height: 20,
+                                            minWidth: 26,
+                                            fontSize: '0.7rem',
+                                            fontWeight: 700,
+                                            bgcolor: alpha(color, 0.16),
+                                            color,
+                                        }}
+                                    />
+                                </Stack>
 
-                            {column.total > column.leads.length && (
-                                <Button
-                                    fullWidth
-                                    size="small"
-                                    sx={{ mt: 1 }}
-                                    onClick={() => loadMore(column.stage, column.leads.length)}
-                                >
-                                    Carregar mais ({column.total - column.leads.length} restantes)
-                                </Button>
-                            )}
-                        </DroppableColumn>
-                    ))}
+                                {column.leads.map((lead) => (
+                                    <LeadCard
+                                        key={lead.id}
+                                        lead={lead}
+                                        accentColor={color}
+                                        onClick={() => setSelectedId(lead.id)}
+                                        selectable={selectionMode}
+                                        selected={selectedLeadIds.includes(lead.id)}
+                                        onToggleSelect={() => toggleLeadSelected(lead.id)}
+                                    />
+                                ))}
+
+                                {column.leads.length === 0 && (
+                                    <Box sx={{ py: 2, textAlign: 'center' }}>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Nenhum lead
+                                        </Typography>
+                                    </Box>
+                                )}
+
+                                {column.total > column.leads.length && (
+                                    <Button
+                                        fullWidth
+                                        size="small"
+                                        sx={{ mt: 1 }}
+                                        onClick={() => loadMore(column.stage, column.leads.length)}
+                                    >
+                                        Carregar mais ({column.total - column.leads.length} restantes)
+                                    </Button>
+                                )}
+                            </DroppableColumn>
+                        );
+                    })}
                 </Stack>
             </DndContext>
 
@@ -291,6 +323,7 @@ export default function KanbanBoard({
                 consultants={consultants}
                 googlePlacesBadgeThresholds={googlePlacesBadgeThresholds}
                 products={products}
+                states={states}
             />
 
             {pendingTransition && (

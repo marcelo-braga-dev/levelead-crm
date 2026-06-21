@@ -28,8 +28,6 @@ class CompanySeeder extends Seeder
             [
                 'razao_social' => 'Exemplo Tecnologia e Serviços LTDA',
                 'nome_fantasia' => 'Exemplo Tech',
-                'city_id' => $city?->id,
-                'state_id' => $state?->id,
                 'primary_cnae_id' => $cnae?->id,
                 'legal_nature_id' => $legalNature?->id,
                 'company_size' => 'ME',
@@ -39,6 +37,8 @@ class CompanySeeder extends Seeder
                 'data_inicio_atividade' => now()->subYears(5),
             ],
         );
+
+        $company->address()->updateOrCreate([], ['city_id' => $city?->id, 'state_id' => $state?->id]);
 
         $company->contacts()->updateOrCreate(
             ['type' => 'phone', 'value' => '11999990000'],

@@ -9,9 +9,9 @@ export function leadScoreTier(totalScore: number): LeadScoreTier {
 }
 
 export const leadScoreTierLabels: Record<LeadScoreTier, string> = {
-    hot: 'Hot',
-    warm: 'Warm',
-    cold: 'Cold',
+    hot: 'Quente',
+    warm: 'Morno',
+    cold: 'Frio',
 };
 
 export const leadScoreTierColors: Record<LeadScoreTier, 'error' | 'warning' | 'default'> = {

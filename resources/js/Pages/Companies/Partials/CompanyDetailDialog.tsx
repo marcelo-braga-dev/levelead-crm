@@ -1,3 +1,4 @@
+import { CompanyAddress } from '@/types';
 import { isOpenStage, leadStageLabels, LeadStageValue } from '@/utils/leadStage';
 import { useForm } from '@inertiajs/react';
 import {
@@ -35,8 +36,7 @@ export interface CompanyRow {
     cnpj: string;
     razao_social: string;
     nome_fantasia: string | null;
-    city: { id: number; name: string } | null;
-    state: { id: number; uf: string } | null;
+    address: CompanyAddress | null;
     contacts: CompanyContact[];
     leads: CompanyLead[];
 }
@@ -94,9 +94,9 @@ export default function CompanyDetailDialog({
                             Nome fantasia: {company.nome_fantasia}
                         </Typography>
                     )}
-                    {company.city && (
+                    {company.address?.city && (
                         <Typography variant="body2" color="text.secondary">
-                            {company.city.name} - {company.state?.uf}
+                            {company.address.city.name} - {company.address.state?.uf}
                         </Typography>
                     )}
                 </Stack>

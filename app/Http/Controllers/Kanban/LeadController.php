@@ -12,6 +12,7 @@ use App\Models\Company;
 use App\Models\Lead;
 use App\Models\Product;
 use App\Models\Setting;
+use App\Models\State;
 use App\Models\User;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -40,6 +41,8 @@ class LeadController extends Controller
             ->with([
                 'company:id,cnpj,razao_social,nome_fantasia,site',
                 'company.placesProfile',
+                'company.address.city:id,name',
+                'company.address.state:id,uf',
                 'assignedTo:id,name',
                 'team:id,name',
                 'proposals' => fn ($q) => $q->with('attachments', 'createdBy:id,name', 'product:id,name')->orderByDesc('version'),
@@ -81,6 +84,7 @@ class LeadController extends Controller
             'loaded' => $loaded,
             'products' => Product::query()->select('id', 'name')->get(),
             'consultants' => User::query()->where('role', UserRole::Consultant->value)->select('id', 'name', 'team_id')->get(),
+            'states' => State::query()->select('id', 'uf')->orderBy('uf')->get(),
             'googlePlacesBadgeThresholds' => [
                 'low_rating' => (float) Setting::get('google_places.low_rating_threshold', 3.5),
                 'low_review_count' => (int) Setting::get('google_places.low_review_threshold', 10),
