@@ -1,27 +1,21 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
+import { PageProps } from '@/types';
 import { Link, useForm, usePage } from '@inertiajs/react';
+import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { FormEventHandler } from 'react';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
-    className = '',
 }: {
     mustVerifyEmail: boolean;
     status?: string;
-    className?: string;
 }) {
-    const user = usePage().props.auth.user;
+    const user = usePage<PageProps>().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-        });
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+        name: user.name,
+        email: user.email,
+    });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -30,89 +24,70 @@ export default function UpdateProfileInformation({
     };
 
     return (
-        <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
-                </h2>
+        <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Informações do perfil
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Atualize seu nome e endereço de e-mail.
+            </Typography>
 
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
-                </p>
-            </header>
-
-            <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
-                        id="name"
-                        className="mt-1 block w-full"
+            <Box component="form" onSubmit={submit}>
+                <Stack spacing={2.5} sx={{ maxWidth: 480 }}>
+                    <TextField
+                        label="Nome"
                         value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
                         autoComplete="name"
-                    />
-
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
+                        autoFocus
+                        fullWidth
                         required
-                        autoComplete="username"
+                        error={Boolean(errors.name)}
+                        helperText={errors.name}
+                        onChange={(e) => setData('name', e.target.value)}
                     />
 
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
+                    <TextField
+                        label="E-mail"
+                        type="email"
+                        value={data.email}
+                        autoComplete="username"
+                        fullWidth
+                        required
+                        error={Boolean(errors.email)}
+                        helperText={errors.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                    />
 
-                {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-gray-800">
-                            Your email address is unverified.
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            >
-                                Click here to re-send the verification email.
-                            </Link>
-                        </p>
+                    {mustVerifyEmail && user.email_verified_at === null && (
+                        <Box>
+                            <Typography variant="body2">
+                                Seu endereço de e-mail não está verificado.{' '}
+                                <Link href={route('verification.send')} method="post" as="button">
+                                    Clique aqui para reenviar o e-mail de verificação.
+                                </Link>
+                            </Typography>
 
-                        {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
-                            </div>
+                            {status === 'verification-link-sent' && (
+                                <Alert severity="success" sx={{ mt: 1 }}>
+                                    Um novo link de verificação foi enviado para seu e-mail.
+                                </Alert>
+                            )}
+                        </Box>
+                    )}
+
+                    <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+                        <Button type="submit" variant="contained" disabled={processing}>
+                            Salvar
+                        </Button>
+
+                        {recentlySuccessful && (
+                            <Typography variant="body2" color="text.secondary">
+                                Salvo.
+                            </Typography>
                         )}
-                    </div>
-                )}
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
-                    >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
-                    </Transition>
-                </div>
-            </form>
-        </section>
+                    </Stack>
+                </Stack>
+            </Box>
+        </Box>
     );
 }

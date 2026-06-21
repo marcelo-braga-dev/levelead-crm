@@ -1,19 +1,44 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import { Link } from '@inertiajs/react';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
 
-export default function Guest({ children }: PropsWithChildren) {
+export default function GuestLayout({ children }: PropsWithChildren) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
-                </Link>
-            </div>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                bgcolor: 'background.default',
+                px: 2,
+            }}
+        >
+            <Stack spacing={3} sx={{ width: '100%', maxWidth: 420, alignItems: 'center' }}>
+                <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            bgcolor: 'primary.main',
+                            color: 'primary.contrastText',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontWeight: 700,
+                            fontSize: '1.1rem',
+                        }}
+                    >
+                        L
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                        LeveLead CRM
+                    </Typography>
+                </Stack>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
-                {children}
-            </div>
-        </div>
+                <Paper sx={{ p: 4, width: '100%' }}>{children}</Paper>
+            </Stack>
+        </Box>
     );
 }

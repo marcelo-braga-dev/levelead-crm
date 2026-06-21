@@ -1,6 +1,6 @@
-import PrimaryButton from '@/Components/PrimaryButton';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 import { FormEventHandler } from 'react';
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -14,38 +14,34 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
     return (
         <GuestLayout>
-            <Head title="Email Verification" />
+            <Head title="Verificação de e-mail" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                Thanks for signing up! Before getting started, could you verify
-                your email address by clicking on the link we just emailed to
-                you? If you didn't receive the email, we will gladly send you
-                another.
-            </div>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+                Verifique seu e-mail
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Obrigado por se cadastrar! Antes de começar, confirme seu endereço de e-mail clicando no
+                link que acabamos de enviar. Se não recebeu o e-mail, ficaremos felizes em enviar outro.
+            </Typography>
 
             {status === 'verification-link-sent' && (
-                <div className="mb-4 text-sm font-medium text-green-600">
-                    A new verification link has been sent to the email address
-                    you provided during registration.
-                </div>
+                <Alert severity="success" sx={{ mb: 3 }}>
+                    Um novo link de verificação foi enviado para o e-mail informado no cadastro.
+                </Alert>
             )}
 
-            <form onSubmit={submit}>
-                <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>
-                        Resend Verification Email
-                    </PrimaryButton>
+            <Box component="form" onSubmit={submit}>
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Button type="submit" variant="contained" disabled={processing}>
+                        Reenviar e-mail de verificação
+                    </Button>
 
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Log Out
+                    <Link href={route('logout')} method="post" as="button">
+                        Sair
                     </Link>
-                </div>
-            </form>
+                </Stack>
+            </Box>
         </GuestLayout>
     );
 }

@@ -35,4 +35,13 @@ class ImportBatch extends Model
     {
         return $this->hasMany(Company::class, 'last_import_batch_id');
     }
+
+    /**
+     * Caminho (relativo ao disco 'local') onde o CSV enviado fica guardado. Derivado do id em
+     * vez de uma coluna própria — `file_name` continua sendo só o nome original para exibição.
+     */
+    public function storedCsvPath(): string
+    {
+        return "imports/{$this->id}.csv";
+    }
 }

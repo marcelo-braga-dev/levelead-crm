@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Concerns\Auditable;
+use App\Enums\LeadStage;
 use App\Enums\RegistrationStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
@@ -112,5 +115,27 @@ class Company extends Model
     public function optOuts(): HasMany
     {
         return $this->hasMany(OptOut::class);
+    }
+
+    public function placesProfile(): HasOne
+    {
+        return $this->hasOne(CompanyPlacesProfile::class);
+    }
+
+    /**
+     * Companies sem nenhum lead, ou cujos leads existentes estão todos em estágio terminal
+     * (Won/Lost) — candidatas a reciclagem. Reabertura é sempre uma ação manual.
+     */
+    public function scopeWithoutActiveLead(Builder $query): Builder
+    {
+        return $query->where(function (Builder $q) {
+            $q->doesntHave('leads')
+                ->orWhere(function (Builder $q2) {
+                    $q2->has('leads')
+                        ->whereDoesntHave('leads', function (Builder $q3) {
+                            $q3->whereNotIn('stage', [LeadStage::Won->value, LeadStage::Lost->value]);
+                        });
+                });
+        });
     }
 }

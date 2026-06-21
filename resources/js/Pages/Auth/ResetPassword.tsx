@@ -1,9 +1,6 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { FormEventHandler } from 'react';
 
 export default function ResetPassword({
@@ -30,71 +27,55 @@ export default function ResetPassword({
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="Redefinir senha" />
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
+            <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
+                Redefinir senha
+            </Typography>
 
-                    <TextInput
-                        id="email"
+            <Box component="form" onSubmit={submit}>
+                <Stack spacing={2.5}>
+                    <TextField
+                        label="E-mail"
                         type="email"
-                        name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
                         autoComplete="username"
+                        fullWidth
+                        error={Boolean(errors.email)}
+                        helperText={errors.email}
                         onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
+                    <TextField
+                        label="Senha"
                         type="password"
-                        name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
-                        isFocused={true}
+                        autoFocus
+                        fullWidth
+                        error={Boolean(errors.password)}
+                        helperText={errors.password}
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
+                    <TextField
+                        label="Confirmar senha"
                         type="password"
-                        name="password_confirmation"
                         value={data.password_confirmation}
-                        className="mt-1 block w-full"
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
+                        fullWidth
+                        error={Boolean(errors.password_confirmation)}
+                        helperText={errors.password_confirmation}
+                        onChange={(e) => setData('password_confirmation', e.target.value)}
                     />
 
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
-                    </PrimaryButton>
-                </div>
-            </form>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button type="submit" variant="contained" disabled={processing}>
+                            Redefinir senha
+                        </Button>
+                    </Box>
+                </Stack>
+            </Box>
         </GuestLayout>
     );
 }

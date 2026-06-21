@@ -64,7 +64,12 @@ test('user can delete their account', function () {
         ->assertRedirect('/');
 
     $this->assertGuest();
-    $this->assertNull($user->fresh());
+    // `User` ganhou `SoftDeletes` (admin desativa/exclui usuários sem perder atribuição
+    // histórica em leads/propostas) — `fresh()` ignora o escopo global e ainda encontra a
+    // linha (com `deleted_at` preenchido); a query padrão (escopada), usada em todo o resto
+    // do app, já não encontra mais.
+    $this->assertNotNull($user->fresh()->deleted_at);
+    $this->assertNull(User::find($user->id));
 });
 
 test('correct password must be provided to delete account', function () {

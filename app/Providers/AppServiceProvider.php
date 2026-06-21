@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
 use App\Models\LeadInteraction;
 use App\Models\LeadStageHistory;
+use App\Models\User;
 use App\Policies\AppendOnlyPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
@@ -29,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
         // Não seguem a convenção Model->ModelPolicy: registrados explicitamente.
         Gate::policy(LeadStageHistory::class, AppendOnlyPolicy::class);
         Gate::policy(LeadInteraction::class, AppendOnlyPolicy::class);
+
+        // Não há model/instância envolvida (Setting é key-value genérico) — ability solta em vez de Policy.
+        Gate::define('manage-appearance', fn (User $user) => $user->role === UserRole::Admin);
     }
 }

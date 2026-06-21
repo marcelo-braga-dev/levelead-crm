@@ -34,6 +34,15 @@ class LeadPolicy
     }
 
     /**
+     * Atribuir/transferir consultor é restrito a admin/manager — um consultor não pode
+     * repassar o próprio lead para outra pessoa.
+     */
+    public function assign(User $user, Lead $lead): bool
+    {
+        return in_array($user->role, [UserRole::Admin, UserRole::Manager], true);
+    }
+
+    /**
      * Manager vê todos os leads da empresa. Consultor só vê leads próprios ou da própria equipe.
      */
     private function canAccess(User $user, Lead $lead): bool

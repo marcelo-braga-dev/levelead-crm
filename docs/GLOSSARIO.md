@@ -36,6 +36,8 @@ Retrocesso permitido apenas 1 nível, com motivo obrigatório, gera `stage_regre
 | **Fit score** | Pontuação firmográfica do Lead (porte, faturamento, CNAE, estado, regime tributário da Company vinculada), calculada por `lead_scoring_rules` configuráveis. |
 | **Intent score** | Pontuação de engajamento (interações recentes, proposta enviada/aberta), fórmula fixa no MVP, com decaimento linear por inatividade. |
 | **Total score** | `fit_score + intent_score`. Thresholds: Hot ≥80, Warm 60–79, Cold <60 (a calibrar com dados reais). |
+| **Perfil Google** | Dados públicos de uma Company obtidos via Google Places API (New) — nota, nº de avaliações, categoria, status operacional. Persistido em `company_places_profiles` (`Company::placesProfile()`). Não confundir com "Google Meu Negócio"/Business Profile API, que só dá acesso a perfis verificados pelo próprio dono do negócio. |
+| **Selo automático** | Chip de alerta exibido no card do Lead, derivado do Perfil Google (Sem site, Poucas avaliações, Nota baixa, Perfil incompleto) — nunca dado manual, sempre recalculado contra os thresholds (`google_places.low_rating_threshold`/`low_review_threshold`). |
 
 ## Compliance (LGPD/ANATEL)
 

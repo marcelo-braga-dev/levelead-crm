@@ -1,9 +1,6 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
+import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { FormEventHandler } from 'react';
 
 export default function ConfirmPassword() {
@@ -21,36 +18,36 @@ export default function ConfirmPassword() {
 
     return (
         <GuestLayout>
-            <Head title="Confirm Password" />
+            <Head title="Confirmar senha" />
 
-            <div className="mb-4 text-sm text-gray-600">
-                This is a secure area of the application. Please confirm your
-                password before continuing.
-            </div>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>
+                Confirmar senha
+            </Typography>
 
-            <form onSubmit={submit}>
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Esta é uma área segura da aplicação. Confirme sua senha antes de continuar.
+            </Typography>
 
-                    <TextInput
-                        id="password"
+            <Box component="form" onSubmit={submit}>
+                <Stack spacing={2.5}>
+                    <TextField
+                        label="Senha"
                         type="password"
-                        name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
-                        isFocused={true}
+                        autoFocus
+                        fullWidth
+                        error={Boolean(errors.password)}
+                        helperText={errors.password}
                         onChange={(e) => setData('password', e.target.value)}
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Confirm
-                    </PrimaryButton>
-                </div>
-            </form>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button type="submit" variant="contained" disabled={processing}>
+                            Confirmar
+                        </Button>
+                    </Box>
+                </Stack>
+            </Box>
         </GuestLayout>
     );
 }

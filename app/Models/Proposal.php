@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['lead_id', 'version', 'status', 'value', 'notes', 'created_by'])]
+#[Fillable(['lead_id', 'product_id', 'version', 'status', 'value', 'notes', 'created_by'])]
 class Proposal extends Model
 {
     use Auditable;
@@ -23,6 +23,11 @@ class Proposal extends Model
     public function lead(): BelongsTo
     {
         return $this->belongsTo(Lead::class);
+    }
+
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class);
     }
 
     public function createdBy(): BelongsTo

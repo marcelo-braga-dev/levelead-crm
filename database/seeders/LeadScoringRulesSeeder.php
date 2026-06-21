@@ -21,6 +21,9 @@ class LeadScoringRulesSeeder extends Seeder
             ['criterion' => 'tax_regime', 'criterion_value' => 'real', 'score_weight' => 15],
             ['criterion' => 'tax_regime', 'criterion_value' => 'presumido', 'score_weight' => 10],
             ['criterion' => 'tax_regime', 'criterion_value' => 'simples', 'score_weight' => 5],
+            // Critérios baseados em `company_places_profiles` (enriquecimento via Google Places API).
+            ['criterion' => 'has_google_profile', 'criterion_value' => '1', 'score_weight' => 5],
+            ['criterion' => 'google_rating_above', 'criterion_value' => '4.0', 'score_weight' => 10],
         ];
 
         foreach ($rules as $rule) {
