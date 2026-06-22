@@ -158,6 +158,22 @@ export default function MapSection({
                 {canEditAddress ? (
                     <Stack spacing={2}>
                         <Grid container spacing={2}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
+                                <TextField
+                                    label="CEP"
+                                    size="small"
+                                    fullWidth
+                                    value={formatCep(form.data.cep)}
+                                    onChange={(e) => handleCepChange(e.target.value)}
+                                    helperText={
+                                        cepLookupLoading
+                                            ? 'Buscando endereço...'
+                                            : cepLookupFailed
+                                                ? 'CEP não encontrado — preencha o endereço manualmente.'
+                                                : ' '
+                                    }
+                                />
+                            </Grid>
                             <Grid size={{ xs: 12, sm: 8 }}>
                                 <TextField
                                     label="Logradouro"
@@ -176,7 +192,7 @@ export default function MapSection({
                                     onChange={(e) => form.setData('numero', e.target.value)}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <TextField
                                     label="Complemento"
                                     size="small"
@@ -185,7 +201,7 @@ export default function MapSection({
                                     onChange={(e) => form.setData('complemento', e.target.value)}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 6 }}>
+                            <Grid size={{ xs: 12, sm: 4 }}>
                                 <TextField
                                     label="Bairro"
                                     size="small"
@@ -194,7 +210,7 @@ export default function MapSection({
                                     onChange={(e) => form.setData('bairro', e.target.value)}
                                 />
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 4 }}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     select
                                     label="Estado"
@@ -214,7 +230,7 @@ export default function MapSection({
                                     ))}
                                 </TextField>
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 4 }}>
+                            <Grid size={{ xs: 12, sm: 6 }}>
                                 <TextField
                                     select
                                     label="Cidade"
@@ -231,22 +247,6 @@ export default function MapSection({
                                         </MenuItem>
                                     ))}
                                 </TextField>
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 4 }}>
-                                <TextField
-                                    label="CEP"
-                                    size="small"
-                                    fullWidth
-                                    value={formatCep(form.data.cep)}
-                                    onChange={(e) => handleCepChange(e.target.value)}
-                                    helperText={
-                                        cepLookupLoading
-                                            ? 'Buscando endereço...'
-                                            : cepLookupFailed
-                                                ? 'CEP não encontrado — preencha o endereço manualmente.'
-                                                : ' '
-                                    }
-                                />
                             </Grid>
                         </Grid>
                         <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
