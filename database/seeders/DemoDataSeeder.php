@@ -216,10 +216,23 @@ class DemoDataSeeder extends Seeder
     }
 
     /** @return array{0: int|null, 1: int|null} [state_id, city_id] */
+    /** UF => capital — só para os dados de demonstração ficarem em cidades reconhecíveis, já que `CitiesSeeder` agora carrega todos os ~5.571 municípios (antes só a capital existia por UF). */
+    private const CAPITALS = [
+        'AC' => 'Rio Branco', 'AL' => 'Maceió', 'AP' => 'Macapá', 'AM' => 'Manaus',
+        'BA' => 'Salvador', 'CE' => 'Fortaleza', 'DF' => 'Brasília', 'ES' => 'Vitória',
+        'GO' => 'Goiânia', 'MA' => 'São Luís', 'MT' => 'Cuiabá', 'MS' => 'Campo Grande',
+        'MG' => 'Belo Horizonte', 'PA' => 'Belém', 'PB' => 'João Pessoa', 'PR' => 'Curitiba',
+        'PE' => 'Recife', 'PI' => 'Teresina', 'RJ' => 'Rio de Janeiro', 'RN' => 'Natal',
+        'RS' => 'Porto Alegre', 'RO' => 'Porto Velho', 'RR' => 'Boa Vista', 'SC' => 'Florianópolis',
+        'SP' => 'São Paulo', 'SE' => 'Aracaju', 'TO' => 'Palmas',
+    ];
+
     private function location(string $uf): array
     {
         $state = State::query()->where('uf', $uf)->first();
-        $city = $state ? City::query()->where('state_id', $state->id)->first() : null;
+        $city = $state
+            ? City::query()->where('state_id', $state->id)->where('name', self::CAPITALS[$uf] ?? null)->first()
+            : null;
 
         return [$state?->id, $city?->id];
     }

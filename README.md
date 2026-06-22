@@ -29,7 +29,7 @@ CRM completo para gestão de leads B2B em operação de call center outbound: fu
 **Dados de empresas (Company)**
 - Importação de base via CSV com auto-detecção de colunas (tolerante a renomeação/reordenação) e mapeamento manual com perfis reutilizáveis.
 - Dedupe por CNPJ, histórico de faturamento/dívida/situação cadastral, sócios e CNAEs.
-- Endereço normalizado em tabela própria, com edição via Estado/Cidade em cascata.
+- Endereço normalizado em tabela própria, com edição via Estado/Cidade em cascata (fixture oficial completo do IBGE — todos os ~5.571 municípios) e preenchimento automático a partir do CEP (ViaCEP).
 - Enriquecimento automático via **Google Places API**: nota, nº de avaliações, categoria, status operacional, selos automáticos (sem site, poucas avaliações, nota baixa, perfil incompleto) e **localização no mapa** (Leaflet + OpenStreetMap), com busca de coordenadas a partir do endereço completo.
 - Busca avançada por estado, cidade, responsável, etapa do lead e período.
 
@@ -67,8 +67,8 @@ CRM completo para gestão de leads B2B em operação de call center outbound: fu
 - **Drag-and-drop**: `@dnd-kit/core` + `@dnd-kit/sortable`
 - **Mapas**: `react-leaflet` + tiles OpenStreetMap
 - **Gráficos**: `recharts`
-- **Integração externa**: Google Places API (New)
-- **Testes**: Pest (215 testes)
+- **Integrações externas**: Google Places API (New), ViaCEP
+- **Testes**: Pest (219 testes)
 - **Ambiente local**: Laravel Sail (Docker)
 - **Deploy**: VPS próprio, não gerenciado
 - **Tenancy**: single-tenant na v1, com schema já preparado para multi-tenant futuro sem migração destrutiva
@@ -93,7 +93,7 @@ composer install
 ./vendor/bin/sail npm install
 ./vendor/bin/sail artisan migrate --seed
 ./vendor/bin/sail npm run build   # ou `npm run dev` para hot reload
-./vendor/bin/sail test            # 215 testes Pest
+./vendor/bin/sail test            # 219 testes Pest
 ```
 
 Passo a passo completo (incluindo solução de problemas comuns) em [`docs/SETUP.md`](docs/SETUP.md).

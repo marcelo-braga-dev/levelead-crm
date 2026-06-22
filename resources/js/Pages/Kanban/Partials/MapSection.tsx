@@ -62,6 +62,8 @@ export default function MapSection({
 
     const [cities, setCities] = useState<CityOption[]>(address?.city ? [address.city] : []);
     const [loadingCities, setLoadingCities] = useState(false);
+    const [cepLookupLoading, setCepLookupLoading] = useState(false);
+    const [cepLookupFailed, setCepLookupFailed] = useState(false);
 
     useEffect(() => {
         if (!form.data.state_id) {
@@ -77,6 +79,56 @@ export default function MapSection({
             .finally(() => setLoadingCities(false));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [form.data.state_id]);
+
+    interface CepLookupResponse {
+        found: boolean;
+        logradouro: string | null;
+        bairro: string | null;
+        city_id: number | null;
+        state_id: number | null;
+        city_name: string | null;
+    }
+
+    function handleCepChange(value: string) {
+        const digits = unmask(value).slice(0, 8);
+        form.setData('cep', digits);
+        setCepLookupFailed(false);
+
+        if (digits.length !== 8) {
+            return;
+        }
+
+        setCepLookupLoading(true);
+        window.axios
+            .get<CepLookupResponse>(route('lookups.cep'), { params: { cep: digits } })
+            .then((response) => {
+                const data = response.data;
+
+                if (!data.found || !data.city_id || !data.state_id) {
+                    setCepLookupFailed(true);
+
+                    return;
+                }
+
+                if (data.city_name) {
+                    setCities((current) =>
+                        current.some((city) => city.id === data.city_id)
+                            ? current
+                            : [...current, { id: data.city_id as number, name: data.city_name as string }],
+                    );
+                }
+
+                form.setData((current) => ({
+                    ...current,
+                    logradouro: data.logradouro ?? current.logradouro,
+                    bairro: data.bairro ?? current.bairro,
+                    state_id: String(data.state_id),
+                    city_id: String(data.city_id),
+                }));
+            })
+            .catch(() => setCepLookupFailed(true))
+            .finally(() => setCepLookupLoading(false));
+    }
 
     function saveAddress() {
         form.patch(route('companies.address.update', companyId), { preserveScroll: true });
@@ -186,7 +238,14 @@ export default function MapSection({
                                     size="small"
                                     fullWidth
                                     value={formatCep(form.data.cep)}
-                                    onChange={(e) => form.setData('cep', unmask(e.target.value).slice(0, 8))}
+                                    onChange={(e) => handleCepChange(e.target.value)}
+                                    helperText={
+                                        cepLookupLoading
+                                            ? 'Buscando endereço...'
+                                            : cepLookupFailed
+                                                ? 'CEP não encontrado — preencha o endereço manualmente.'
+                                                : ' '
+                                    }
                                 />
                             </Grid>
                         </Grid>

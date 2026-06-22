@@ -19,7 +19,7 @@ class CompanySeeder extends Seeder
     public function run(): void
     {
         $state = State::query()->where('uf', 'SP')->first();
-        $city = City::query()->where('state_id', $state?->id)->first();
+        $city = City::query()->where('state_id', $state?->id)->where('name', 'São Paulo')->first();
         $cnae = Cnae::query()->where('code', '6202-3/00')->first();
         $legalNature = LegalNature::query()->where('code', '2062')->first();
 

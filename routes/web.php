@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/companies/{company}/places-profile', [GooglePlacesProfileController::class, 'store'])->name('companies.places-profile.store');
 
     Route::get('/lookups/cities', [LookupController::class, 'cities'])->name('lookups.cities');
+    Route::get('/lookups/cep', [LookupController::class, 'cep'])->name('lookups.cep');
 
     Route::get('/companies/import', [ImportController::class, 'create'])->name('companies.import');
     Route::post('/companies/import', [ImportController::class, 'store'])->name('companies.import.store');
