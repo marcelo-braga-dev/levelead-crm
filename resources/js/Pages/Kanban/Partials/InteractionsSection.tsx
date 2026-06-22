@@ -1,5 +1,5 @@
 import { InteractionType, LeadInteractionEntry } from '@/types';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatPhone, unmask } from '@/utils/format';
 import { useForm } from '@inertiajs/react';
 import {
     Alert,
@@ -103,8 +103,8 @@ export default function InteractionsSection({
                     <TextField
                         label="Número discado"
                         size="small"
-                        value={form.data.phone_dialed}
-                        onChange={(e) => form.setData('phone_dialed', e.target.value)}
+                        value={formatPhone(form.data.phone_dialed)}
+                        onChange={(e) => form.setData('phone_dialed', unmask(e.target.value).slice(0, 11))}
                     />
                 )}
 
@@ -161,7 +161,7 @@ export default function InteractionsSection({
                             secondary={[
                                 formatDate(entry.occurred_at),
                                 entry.user?.name,
-                                entry.phone_dialed,
+                                formatPhone(entry.phone_dialed),
                                 entry.description,
                             ]
                                 .filter(Boolean)

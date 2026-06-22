@@ -6,6 +6,7 @@ import ProposalsSection from '@/Pages/Kanban/Partials/ProposalsSection';
 import { ConsultantOption, GooglePlacesBadgeThresholds } from '@/Pages/Kanban/Board';
 import { LeadCardData, PageProps } from '@/types';
 import { topAlignedDialogSlotProps } from '@/utils/dialog';
+import { formatPhone, unmask } from '@/utils/format';
 import { leadStageLabels, LeadStageValue } from '@/utils/leadStage';
 import { router, usePage, useForm } from '@inertiajs/react';
 import {
@@ -154,8 +155,8 @@ export default function LeadDetailDialog({
                                     label="Telefone"
                                     size="small"
                                     fullWidth
-                                    value={form.data.contact_phone}
-                                    onChange={(e) => form.setData('contact_phone', e.target.value)}
+                                    value={formatPhone(form.data.contact_phone)}
+                                    onChange={(e) => form.setData('contact_phone', unmask(e.target.value).slice(0, 11))}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6 }}>
@@ -163,8 +164,8 @@ export default function LeadDetailDialog({
                                     label="WhatsApp"
                                     size="small"
                                     fullWidth
-                                    value={form.data.contact_whatsapp}
-                                    onChange={(e) => form.setData('contact_whatsapp', e.target.value)}
+                                    value={formatPhone(form.data.contact_whatsapp)}
+                                    onChange={(e) => form.setData('contact_whatsapp', unmask(e.target.value).slice(0, 11))}
                                 />
                             </Grid>
                             <Grid size={{ xs: 12, sm: 6 }}>

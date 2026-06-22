@@ -42,6 +42,12 @@ class LeadPolicy
         return in_array($user->role, [UserRole::Admin, UserRole::Manager], true);
     }
 
+    /** Reabrir um lead perdido é uma decisão gerencial — mesmo critério de assign(). */
+    public function recycle(User $user, Lead $lead): bool
+    {
+        return in_array($user->role, [UserRole::Admin, UserRole::Manager], true);
+    }
+
     /**
      * Manager vê todos os leads da empresa. Consultor só vê leads próprios ou da própria equipe.
      */

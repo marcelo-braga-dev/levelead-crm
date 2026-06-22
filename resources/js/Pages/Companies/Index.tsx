@@ -1,5 +1,6 @@
 import MuiAuthenticatedLayout from '@/Layouts/MuiAuthenticatedLayout';
-import CompanyDetailDialog, { CompanyRow } from '@/Pages/Companies/Partials/CompanyDetailDialog';
+import CompanyDetailDialog, { CompanyRow, LossReasonRecycleRule } from '@/Pages/Companies/Partials/CompanyDetailDialog';
+import { formatCnpj } from '@/utils/format';
 import { isOpenStage, leadStageLabels } from '@/utils/leadStage';
 import { Head, Link, router } from '@inertiajs/react';
 import {
@@ -43,11 +44,13 @@ export default function CompaniesIndex({
     filters,
     states,
     consultants,
+    lossReasonRecycleRules,
 }: {
     companies: PaginatedCompanies;
     filters: CompanyFilters;
     states: { id: number; uf: string }[];
     consultants: { id: number; name: string }[];
+    lossReasonRecycleRules: LossReasonRecycleRule[];
 }) {
     const [search, setSearch] = useState(filters.search);
     const [city, setCity] = useState(filters.city);
@@ -190,7 +193,7 @@ export default function CompaniesIndex({
                                 onClick={() => setSelected(company)}
                             >
                                 <TableCell>{company.razao_social}</TableCell>
-                                <TableCell>{company.cnpj}</TableCell>
+                                <TableCell>{formatCnpj(company.cnpj)}</TableCell>
                                 <TableCell>
                                     {company.address?.city
                                         ? `${company.address.city.name}/${company.address.state?.uf}`
@@ -229,6 +232,7 @@ export default function CompaniesIndex({
                 company={selected}
                 open={selected !== null}
                 onClose={() => setSelected(null)}
+                lossReasonRecycleRules={lossReasonRecycleRules}
             />
         </MuiAuthenticatedLayout>
     );

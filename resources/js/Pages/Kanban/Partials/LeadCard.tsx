@@ -1,5 +1,5 @@
 import { LeadCardData } from '@/types';
-import { formatCurrency, formatRelativeDays, formatShortDate } from '@/utils/format';
+import { formatCurrency, formatPhone, formatRelativeDays, formatShortDate } from '@/utils/format';
 import { leadScoreTier, leadScoreTierColors, leadScoreTierLabels } from '@/utils/leadScore';
 import { useDraggable } from '@dnd-kit/core';
 import AlarmIcon from '@mui/icons-material/Alarm';
@@ -84,7 +84,7 @@ export default function LeadCard({
                             {lead.contact_name}
                         </Typography>
                         {lead.contact_phone && (
-                            <Tooltip title={`Ligar para ${lead.contact_phone}`}>
+                            <Tooltip title={`Ligar para ${formatPhone(lead.contact_phone)}`}>
                                 <IconButton
                                     size="small"
                                     component="a"

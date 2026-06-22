@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
     Route::patch('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
     Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
+    Route::post('/leads/{lead}/recycle', [LeadController::class, 'recycle'])->name('leads.recycle');
     Route::patch('/leads/{lead}/stage', [LeadStageController::class, 'update'])->name('leads.stage.update');
 
     Route::post('/leads/{lead}/proposals', [ProposalController::class, 'store'])->name('proposals.store');

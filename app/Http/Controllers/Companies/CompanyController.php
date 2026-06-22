@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateCompanyAddressRequest;
 use App\Models\Company;
+use App\Models\LossReasonRecycleRule;
 use App\Models\State;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -34,7 +35,7 @@ class CompanyController extends Controller
                 'address.city:id,name',
                 'address.state:id,uf',
                 'contacts',
-                'leads:id,company_id,stage,assigned_to,created_at',
+                'leads:id,company_id,stage,loss_reason,assigned_to,created_at,stage_entered_at',
                 'leads.assignedTo:id,name',
                 'placesProfile',
             ])
@@ -90,6 +91,9 @@ class CompanyController extends Controller
             ],
             'states' => State::query()->select('id', 'uf')->orderBy('uf')->get(),
             'consultants' => User::query()->where('role', UserRole::Consultant->value)->select('id', 'name')->get(),
+            'lossReasonRecycleRules' => LossReasonRecycleRule::query()
+                ->select('loss_reason', 'suggested_recycle_days_min', 'suggested_recycle_days_max', 'is_recyclable')
+                ->get(),
         ]);
     }
 

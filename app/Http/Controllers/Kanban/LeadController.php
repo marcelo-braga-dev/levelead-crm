@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Kanban;
 
 use App\Actions\Leads\CreateLeadAction;
+use App\Actions\Leads\RecycleLeadAction;
 use App\Enums\LeadStage;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
@@ -135,5 +136,18 @@ class LeadController extends Controller
         $lead->delete();
 
         return back()->with('status', 'Lead removido com sucesso.');
+    }
+
+    public function recycle(Lead $lead, RecycleLeadAction $action): RedirectResponse
+    {
+        Gate::authorize('recycle', $lead);
+
+        try {
+            $action->execute($lead);
+        } catch (DomainException $e) {
+            return back()->withErrors(['recycle' => $e->getMessage()]);
+        }
+
+        return back()->with('status', 'Lead reciclado com sucesso — novo lead criado em "Lead Novo".');
     }
 }

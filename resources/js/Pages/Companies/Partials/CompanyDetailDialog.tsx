@@ -1,7 +1,9 @@
-import { CompanyAddress } from '@/types';
+import { CompanyAddress, PageProps } from '@/types';
+import { formatCnpj, formatPhone, unmask } from '@/utils/format';
 import { isOpenStage, leadStageLabels, LeadStageValue } from '@/utils/leadStage';
-import { useForm } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import {
+    Alert,
     Box,
     Button,
     Chip,
@@ -29,6 +31,15 @@ export interface CompanyContact {
 export interface CompanyLead {
     id: number;
     stage: LeadStageValue;
+    loss_reason: string | null;
+    stage_entered_at: string;
+}
+
+export interface LossReasonRecycleRule {
+    loss_reason: string;
+    suggested_recycle_days_min: number | null;
+    suggested_recycle_days_max: number | null;
+    is_recyclable: boolean;
 }
 
 export interface CompanyRow {
@@ -45,11 +56,15 @@ export default function CompanyDetailDialog({
     company,
     open,
     onClose,
+    lossReasonRecycleRules,
 }: {
     company: CompanyRow | null;
     open: boolean;
     onClose: () => void;
+    lossReasonRecycleRules: LossReasonRecycleRule[];
 }) {
+    const { auth } = usePage<PageProps>().props;
+    const canRecycle = auth.user.role === 'admin' || auth.user.role === 'manager';
     const [showCreateLeadForm, setShowCreateLeadForm] = useState(false);
 
     const primaryPhone = company?.contacts.find((c) => c.type === 'phone' && c.is_primary)?.value ?? '';
@@ -71,6 +86,18 @@ export default function CompanyDetailDialog({
     const hasOpenLead = company.leads.some((lead) => isOpenStage(lead.stage));
     const companyId = company.id;
 
+    const lostLeads = company.leads.filter((lead) => lead.stage === 'lost');
+    const lastLost = lostLeads.length === 0
+        ? null
+        : lostLeads.reduce((latest, lead) =>
+            new Date(lead.stage_entered_at) > new Date(latest.stage_entered_at) ? lead : latest);
+    const recycleRule = lastLost
+        ? lossReasonRecycleRules.find((rule) => rule.loss_reason === lastLost.loss_reason)
+        : undefined;
+    const daysSinceLost = lastLost
+        ? Math.floor((Date.now() - new Date(lastLost.stage_entered_at).getTime()) / 86_400_000)
+        : 0;
+
     function submitCreateLead() {
         form.transform((data) => ({ ...data, company_id: companyId }));
         form.post(route('leads.store'), {
@@ -81,13 +108,21 @@ export default function CompanyDetailDialog({
         });
     }
 
+    function recycleLead() {
+        if (!lastLost) {
+            return;
+        }
+
+        router.post(route('leads.recycle', lastLost.id), {}, { onSuccess: () => onClose() });
+    }
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>{company.razao_social}</DialogTitle>
             <DialogContent>
                 <Stack spacing={1} sx={{ mb: 2 }}>
                     <Typography variant="body2" color="text.secondary">
-                        CNPJ: {company.cnpj}
+                        CNPJ: {formatCnpj(company.cnpj)}
                     </Typography>
                     {company.nome_fantasia && (
                         <Typography variant="body2" color="text.secondary">
@@ -114,7 +149,14 @@ export default function CompanyDetailDialog({
                     )}
                     {company.contacts.map((contact) => (
                         <ListItem key={contact.id} disableGutters>
-                            <ListItemText primary={contact.value} secondary={contact.type} />
+                            <ListItemText
+                                primary={
+                                    contact.type === 'phone' || contact.type === 'whatsapp'
+                                        ? formatPhone(contact.value)
+                                        : contact.value
+                                }
+                                secondary={contact.type}
+                            />
                         </ListItem>
                     ))}
                 </List>
@@ -138,6 +180,16 @@ export default function CompanyDetailDialog({
                     ))}
                 </Stack>
 
+                {!hasOpenLead && lastLost && (
+                    <Alert severity={recycleRule?.is_recyclable === false ? 'warning' : 'info'} sx={{ mb: 2 }}>
+                        {recycleRule?.is_recyclable === false
+                            ? 'O motivo da última perda normalmente não é recomendado para reciclagem.'
+                            : recycleRule?.suggested_recycle_days_min != null
+                                ? `Janela sugerida para reciclar: ${recycleRule.suggested_recycle_days_min}-${recycleRule.suggested_recycle_days_max} dias após a perda (já se passaram ${daysSinceLost}).`
+                                : `Lead perdido há ${daysSinceLost} dia(s).`}
+                    </Alert>
+                )}
+
                 {!hasOpenLead && showCreateLeadForm && (
                     <Box component="form" sx={{ mt: 2 }} onSubmit={(e) => { e.preventDefault(); submitCreateLead(); }}>
                         <Stack spacing={2}>
@@ -150,8 +202,8 @@ export default function CompanyDetailDialog({
                             />
                             <TextField
                                 label="Telefone"
-                                value={form.data.contact_phone}
-                                onChange={(e) => form.setData('contact_phone', e.target.value)}
+                                value={formatPhone(form.data.contact_phone)}
+                                onChange={(e) => form.setData('contact_phone', unmask(e.target.value).slice(0, 11))}
                                 size="small"
                                 fullWidth
                             />
@@ -170,6 +222,11 @@ export default function CompanyDetailDialog({
                 )}
             </DialogContent>
             <DialogActions>
+                {!hasOpenLead && lastLost && canRecycle && (
+                    <Button onClick={recycleLead} variant="outlined">
+                        Reciclar lead perdido
+                    </Button>
+                )}
                 {!hasOpenLead && !showCreateLeadForm && (
                     <Button onClick={() => setShowCreateLeadForm(true)} variant="contained">
                         Criar lead

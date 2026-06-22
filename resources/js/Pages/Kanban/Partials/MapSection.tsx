@@ -1,4 +1,5 @@
 import { CompanyAddress, CompanyPlacesProfile } from '@/types';
+import { formatCep, unmask } from '@/utils/format';
 import { router, useForm } from '@inertiajs/react';
 import RoomIcon from '@mui/icons-material/Room';
 import {
@@ -184,8 +185,8 @@ export default function MapSection({
                                     label="CEP"
                                     size="small"
                                     fullWidth
-                                    value={form.data.cep}
-                                    onChange={(e) => form.setData('cep', e.target.value)}
+                                    value={formatCep(form.data.cep)}
+                                    onChange={(e) => form.setData('cep', unmask(e.target.value).slice(0, 8))}
                                 />
                             </Grid>
                         </Grid>
