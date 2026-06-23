@@ -158,3 +158,67 @@ it('forbids a consultant from transitioning a lead outside their team', function
         ->patch(route('leads.stage.update', $lead), ['to_stage' => 'attempting_contact'])
         ->assertForbidden();
 });
+
+it('lets a consultant move their own lead to won without won_value, leaving it unset', function () {
+    $consultant = User::factory()->create(['role' => UserRole::Consultant]);
+    $lead = createLeadForStageTest(LeadStage::Negotiation);
+    $lead->update(['assigned_to' => $consultant->id]);
+
+    $response = $this->actingAs($consultant)->patch(route('leads.stage.update', $lead), ['to_stage' => 'won']);
+
+    $response->assertSessionDoesntHaveErrors();
+    expect($lead->fresh()->stage)->toBe(LeadStage::Won);
+    expect($lead->fresh()->won_value)->toBeNull();
+});
+
+it('ignores won_value/won_product_id sent by a consultant even if provided', function () {
+    $consultant = User::factory()->create(['role' => UserRole::Consultant]);
+    $lead = createLeadForStageTest(LeadStage::Negotiation);
+    $lead->update(['assigned_to' => $consultant->id]);
+    $product = Product::create(['name' => 'Produto Teste']);
+
+    $response = $this->actingAs($consultant)->patch(route('leads.stage.update', $lead), [
+        'to_stage' => 'won',
+        'won_value' => '9999.00',
+        'won_product_id' => $product->id,
+    ]);
+
+    $response->assertSessionDoesntHaveErrors();
+    expect($lead->fresh()->won_value)->toBeNull();
+    expect($lead->fresh()->won_product_id)->toBeNull();
+});
+
+it('lets an admin confirm the won value after the fact', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $lead = createLeadForStageTest(LeadStage::Won);
+    $product = Product::create(['name' => 'Produto Teste']);
+
+    $response = $this->actingAs($admin)->patch(route('leads.won-value.confirm', $lead), [
+        'won_value' => '2500.00',
+        'won_product_id' => $product->id,
+    ]);
+
+    $response->assertSessionDoesntHaveErrors();
+    expect((string) $lead->fresh()->won_value)->toBe('2500.00');
+    expect($lead->fresh()->won_product_id)->toBe($product->id);
+});
+
+it('forbids a consultant from confirming the won value', function () {
+    $consultant = User::factory()->create(['role' => UserRole::Consultant]);
+    $lead = createLeadForStageTest(LeadStage::Won);
+    $lead->update(['assigned_to' => $consultant->id]);
+
+    $this->actingAs($consultant)
+        ->patch(route('leads.won-value.confirm', $lead), ['won_value' => '2500.00'])
+        ->assertForbidden();
+});
+
+it('refuses to confirm the won value when the lead is not in the won stage', function () {
+    $admin = User::factory()->create(['role' => UserRole::Admin]);
+    $lead = createLeadForStageTest(LeadStage::Negotiation);
+
+    $response = $this->actingAs($admin)->patch(route('leads.won-value.confirm', $lead), ['won_value' => '2500.00']);
+
+    $response->assertSessionHasErrors('won_value');
+    expect($lead->fresh()->won_value)->toBeNull();
+});

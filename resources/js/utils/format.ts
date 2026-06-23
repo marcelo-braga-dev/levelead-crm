@@ -10,6 +10,20 @@ export function formatDate(value: string | null): string {
     return value === null ? '—' : new Date(value).toLocaleString('pt-BR');
 }
 
+/**
+ * Datas "puras" (cast `date` do Eloquent, sem componente de hora) — reformata o string
+ * ISO direto, sem passar por `Date`/timezone, que deslocaria o dia em fusos atrás de UTC.
+ */
+export function formatDateOnly(value: string | null): string {
+    if (value === null) {
+        return '—';
+    }
+
+    const [year, month, day] = value.slice(0, 10).split('-');
+
+    return `${day}/${month}/${year}`;
+}
+
 export function formatShortDate(value: string): string {
     return new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
 }
@@ -67,7 +81,7 @@ export function formatCnpj(value: string | null | undefined): string {
     return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
 }
 
-/** "12345678901" -> "123.456.789-01". Sem consumidor no app ainda (sócios/CPF não têm tela). */
+/** "12345678901" -> "123.456.789-01". */
 export function formatCpf(value: string | null | undefined): string {
     if (!value) {
         return '';

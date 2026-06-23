@@ -49,6 +49,15 @@ class LeadPolicy
     }
 
     /**
+     * Definir/confirmar valor e produto do fechamento é gerencial — consultor pode mover o lead
+     * para Ganho, mas não fecha o valor sozinho (mesmo critério de assign()/recycle()).
+     */
+    public function confirmWonValue(User $user, Lead $lead): bool
+    {
+        return in_array($user->role, [UserRole::Admin, UserRole::Manager], true);
+    }
+
+    /**
      * Manager vê todos os leads da empresa. Consultor só vê leads próprios ou da própria equipe.
      */
     private function canAccess(User $user, Lead $lead): bool

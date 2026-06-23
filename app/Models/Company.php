@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\Auditable;
 use App\Enums\LeadStage;
+use App\Enums\PersonType;
 use App\Enums\RegistrationStatus;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
-    'cnpj', 'razao_social', 'nome_fantasia',
+    'person_type', 'cnpj', 'cpf', 'razao_social', 'nome_fantasia',
     'matriz_filial', 'ente_federativo',
     'primary_cnae_id', 'legal_nature_id',
     'data_inicio_atividade', 'company_size',
@@ -32,6 +33,7 @@ class Company extends Model
     protected function casts(): array
     {
         return [
+            'person_type' => PersonType::class,
             'data_inicio_atividade' => 'date',
             'is_mei' => 'boolean',
             'mei_entry_date' => 'date',

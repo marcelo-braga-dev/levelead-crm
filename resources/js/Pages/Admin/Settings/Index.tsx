@@ -112,7 +112,7 @@ export default function SettingsIndex({
                             placeholder={googlePlacesApiKey.masked ?? 'Cole aqui a chave da API'}
                             helperText={
                                 (form.errors as Record<string, string>).google_places_api_key ??
-                                'Deixe em branco para manter a chave atual. Usada para enriquecer empresas (nota, categoria, status) e para mostrar a localização do lead na aba Mapa.'
+                                'Deixe em branco para manter a chave atual. Usada para enriquecer leads (nota, categoria, status) e para mostrar a localização do lead na aba Mapa.'
                             }
                             error={Boolean((form.errors as Record<string, string>).google_places_api_key)}
                         />

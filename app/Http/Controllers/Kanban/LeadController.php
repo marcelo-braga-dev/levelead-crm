@@ -40,12 +40,29 @@ class LeadController extends Controller
 
         $query = Lead::query()
             ->with([
-                'company:id,cnpj,razao_social,nome_fantasia,site',
+                'company' => fn ($q) => $q->select([
+                    'id', 'person_type', 'cnpj', 'cpf', 'razao_social', 'nome_fantasia', 'site',
+                    'matriz_filial', 'ente_federativo', 'primary_cnae_id', 'legal_nature_id',
+                    'data_inicio_atividade', 'company_size', 'share_capital',
+                    'is_mei', 'mei_entry_date', 'mei_exit_date',
+                    'registration_status', 'registration_status_date', 'tax_regime',
+                    'estimated_revenue_value', 'employee_count',
+                    'active_federal_debt', 'total_debt',
+                ]),
                 'company.placesProfile',
                 'company.address.city:id,name',
                 'company.address.state:id,uf',
+                'company.primaryCnae:id,code,description',
+                'company.legalNature:id,code,description',
+                'company.contacts',
+                'company.partners' => fn ($q) => $q->select(['id', 'company_id', 'nome', 'tipo_documento', 'faixa_etaria', 'partner_qualification_id', 'data_entrada']),
+                'company.partners.partnerQualification:id,description',
+                'company.financialSnapshots' => fn ($q) => $q->orderByDesc('snapshot_date'),
                 'assignedTo:id,name',
                 'team:id,name',
+                'leadSource:id,name',
+                'wonProduct:id,name',
+                'recycledFrom:id,created_at',
                 'proposals' => fn ($q) => $q->with('attachments', 'createdBy:id,name', 'product:id,name')->orderByDesc('version'),
                 'followUps' => fn ($q) => $q->with('createdBy:id,name')->orderBy('scheduled_at'),
                 'interactions' => fn ($q) => $q->with('user:id,name')->latest('occurred_at'),
@@ -120,7 +137,12 @@ class LeadController extends Controller
         return back()->with('status', 'Lead criado com sucesso.');
     }
 
-    public function update(UpdateLeadRequest $request, Lead $lead): RedirectResponse
+    /**
+     * Escopo estreito: só contato/qualificação do próprio lead — é o que permite o consultor
+     * responsável editar esses campos a partir da página Leads sem precisar de acesso admin/
+     * manager (esse é o critério de companies.update, que cobre os dados cadastrais da Company).
+     */
+    public function updateContact(UpdateLeadRequest $request, Lead $lead): RedirectResponse
     {
         Gate::authorize('update', $lead);
 

@@ -19,6 +19,15 @@ export const leadStageLabels: Record<LeadStageValue, string> = {
     lost: 'Perdido',
 };
 
+export const lossReasonLabels: Record<string, string> = {
+    no_budget: 'Sem orçamento',
+    bad_timing: 'Timing ruim',
+    competition: 'Concorrência',
+    no_interest: 'Sem interesse',
+    invalid_data: 'Dados inválidos',
+    other: 'Outro',
+};
+
 export const terminalStages: LeadStageValue[] = ['won', 'lost'];
 
 export function isOpenStage(stage: string): boolean {

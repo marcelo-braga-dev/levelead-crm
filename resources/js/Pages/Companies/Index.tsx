@@ -1,10 +1,12 @@
 import MuiAuthenticatedLayout from '@/Layouts/MuiAuthenticatedLayout';
-import CompanyDetailDialog, { CompanyRow, LossReasonRecycleRule } from '@/Pages/Companies/Partials/CompanyDetailDialog';
-import { formatCnpj } from '@/utils/format';
+import LeadFormDialog, { CompanyRow, LossReasonRecycleRule } from '@/Pages/Companies/Partials/LeadFormDialog';
+import { PageProps } from '@/types';
+import { formatCnpj, formatCpf } from '@/utils/format';
 import { isOpenStage, leadStageLabels } from '@/utils/leadStage';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Box,
+    Button,
     Chip,
     FormControlLabel,
     MenuItem,
@@ -57,6 +59,9 @@ export default function CompaniesIndex({
     const [createdFrom, setCreatedFrom] = useState(filters.created_from ?? '');
     const [createdTo, setCreatedTo] = useState(filters.created_to ?? '');
     const [selected, setSelected] = useState<CompanyRow | null>(null);
+    const [createOpen, setCreateOpen] = useState(false);
+    const { auth } = usePage<PageProps>().props;
+    const canCreate = auth.user.role === 'admin' || auth.user.role === 'manager';
 
     function applyFilters(next: Partial<CompanyFilters>) {
         router.get(
@@ -81,8 +86,16 @@ export default function CompaniesIndex({
     }
 
     return (
-        <MuiAuthenticatedLayout title="Empresas">
-            <Head title="Empresas" />
+        <MuiAuthenticatedLayout title="Leads">
+            <Head title="Leads" />
+
+            {canCreate && (
+                <Stack direction="row" sx={{ justifyContent: 'flex-end', mb: 2 }}>
+                    <Button variant="contained" onClick={() => setCreateOpen(true)}>
+                        Novo lead
+                    </Button>
+                </Stack>
+            )}
 
             <Stack direction="row" spacing={2} sx={{ mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                 <TextField
@@ -178,8 +191,8 @@ export default function CompaniesIndex({
                 <Table size="small">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Razão Social</TableCell>
-                            <TableCell>CNPJ</TableCell>
+                            <TableCell>Nome / Razão Social</TableCell>
+                            <TableCell>CNPJ/CPF</TableCell>
                             <TableCell>Cidade/UF</TableCell>
                             <TableCell>Status do lead</TableCell>
                         </TableRow>
@@ -193,7 +206,9 @@ export default function CompaniesIndex({
                                 onClick={() => setSelected(company)}
                             >
                                 <TableCell>{company.razao_social}</TableCell>
-                                <TableCell>{formatCnpj(company.cnpj)}</TableCell>
+                                <TableCell>
+                                    {company.person_type === 'pf' ? formatCpf(company.cpf) : formatCnpj(company.cnpj)}
+                                </TableCell>
                                 <TableCell>
                                     {company.address?.city
                                         ? `${company.address.city.name}/${company.address.state?.uf}`
@@ -205,7 +220,7 @@ export default function CompaniesIndex({
                         {companies.data.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={4} align="center">
-                                    Nenhuma empresa encontrada. <Link href={route('companies.import')}>Importar CSV</Link>
+                                    Nenhum lead encontrado. <Link href={route('companies.import')}>Importar CSV</Link>
                                 </TableCell>
                             </TableRow>
                         )}
@@ -227,11 +242,14 @@ export default function CompaniesIndex({
                 />
             </Box>
 
-            <CompanyDetailDialog
-                key={selected?.id ?? 'none'}
+            <LeadFormDialog
+                key={selected?.id ?? 'new'}
                 company={selected}
-                open={selected !== null}
-                onClose={() => setSelected(null)}
+                open={selected !== null || createOpen}
+                onClose={() => {
+                    setSelected(null);
+                    setCreateOpen(false);
+                }}
                 lossReasonRecycleRules={lossReasonRecycleRules}
             />
         </MuiAuthenticatedLayout>

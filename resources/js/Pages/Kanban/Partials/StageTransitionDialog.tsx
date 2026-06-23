@@ -1,7 +1,9 @@
+import { PageProps } from '@/types';
 import { topAlignedDialogSlotProps } from '@/utils/dialog';
-import { leadStageLabels, LeadStageValue } from '@/utils/leadStage';
-import { useForm } from '@inertiajs/react';
+import { leadStageLabels, LeadStageValue, lossReasonLabels } from '@/utils/leadStage';
+import { useForm, usePage } from '@inertiajs/react';
 import {
+    Alert,
     Button,
     Dialog,
     DialogActions,
@@ -16,15 +18,6 @@ import {
 
 export type StageTransitionKind = 'lost' | 'won' | 'regression';
 
-const lossReasonOptions = [
-    { value: 'no_budget', label: 'Sem orçamento' },
-    { value: 'bad_timing', label: 'Timing ruim' },
-    { value: 'competition', label: 'Concorrência' },
-    { value: 'no_interest', label: 'Sem interesse' },
-    { value: 'invalid_data', label: 'Dados inválidos' },
-    { value: 'other', label: 'Outro' },
-];
-
 export default function StageTransitionDialog({
     leadId,
     toStage,
@@ -38,6 +31,9 @@ export default function StageTransitionDialog({
     products: { id: number; name: string }[];
     onClose: () => void;
 }) {
+    const { auth } = usePage<PageProps>().props;
+    const canSetWonValue = auth.user.role === 'admin' || auth.user.role === 'manager';
+
     const form = useForm({
         to_stage: toStage,
         reason: '',
@@ -65,9 +61,9 @@ export default function StageTransitionDialog({
                                 onChange={(e) => form.setData('loss_reason', e.target.value)}
                             >
                                 <MenuItem value="">Selecione o motivo da perda</MenuItem>
-                                {lossReasonOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
+                                {Object.entries(lossReasonLabels).map(([value, label]) => (
+                                    <MenuItem key={value} value={value}>
+                                        {label}
                                     </MenuItem>
                                 ))}
                             </Select>
@@ -89,31 +85,39 @@ export default function StageTransitionDialog({
 
                     {kind === 'won' && (
                         <>
-                            <TextField
-                                label="Valor do fechamento"
-                                size="small"
-                                type="number"
-                                value={form.data.won_value}
-                                onChange={(e) => form.setData('won_value', e.target.value)}
-                            />
-                            {form.errors.won_value && (
-                                <Typography color="error" variant="body2">
-                                    {form.errors.won_value}
-                                </Typography>
+                            {canSetWonValue ? (
+                                <>
+                                    <TextField
+                                        label="Valor do fechamento"
+                                        size="small"
+                                        type="number"
+                                        value={form.data.won_value}
+                                        onChange={(e) => form.setData('won_value', e.target.value)}
+                                    />
+                                    {form.errors.won_value && (
+                                        <Typography color="error" variant="body2">
+                                            {form.errors.won_value}
+                                        </Typography>
+                                    )}
+                                    <Select
+                                        size="small"
+                                        displayEmpty
+                                        value={form.data.won_product_id}
+                                        onChange={(e) => form.setData('won_product_id', e.target.value)}
+                                    >
+                                        <MenuItem value="">Produto (opcional)</MenuItem>
+                                        {products.map((product) => (
+                                            <MenuItem key={product.id} value={product.id}>
+                                                {product.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </>
+                            ) : (
+                                <Alert severity="info">
+                                    Valor e produto do fechamento serão confirmados por um administrador/gestor.
+                                </Alert>
                             )}
-                            <Select
-                                size="small"
-                                displayEmpty
-                                value={form.data.won_product_id}
-                                onChange={(e) => form.setData('won_product_id', e.target.value)}
-                            >
-                                <MenuItem value="">Produto (opcional)</MenuItem>
-                                {products.map((product) => (
-                                    <MenuItem key={product.id} value={product.id}>
-                                        {product.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
                         </>
                     )}
 

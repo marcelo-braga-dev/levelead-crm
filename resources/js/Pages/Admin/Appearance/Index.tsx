@@ -183,7 +183,7 @@ export default function AppearanceIndex({
                                                     <Card sx={{ mt: 0.75, borderLeft: `4px solid ${color}` }}>
                                                         <CardContent sx={{ p: 1, '&:last-child': { pb: 1 } }}>
                                                             <Typography variant="caption" noWrap>
-                                                                Empresa Exemplo
+                                                                Lead Exemplo
                                                             </Typography>
                                                         </CardContent>
                                                     </Card>

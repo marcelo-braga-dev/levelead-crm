@@ -26,7 +26,7 @@ export default function CompaniesImport(props: {
     const activeStep = steps.findIndex((step) => step.key === props.step);
 
     return (
-        <MuiAuthenticatedLayout title="Importar Empresas via CSV">
+        <MuiAuthenticatedLayout title="Importar Leads via CSV">
             <Head title="Importar CSV" />
 
             <Stepper activeStep={activeStep} sx={{ mb: 3 }}>

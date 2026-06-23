@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Companies;
 
+use App\Actions\Companies\CreateLeadWithCompanyAction;
+use App\Actions\Companies\UpdateLeadWithCompanyAction;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyAddressRequest;
+use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\LossReasonRecycleRule;
 use App\Models\State;
@@ -35,7 +39,7 @@ class CompanyController extends Controller
                 'address.city:id,name',
                 'address.state:id,uf',
                 'contacts',
-                'leads:id,company_id,stage,loss_reason,assigned_to,created_at,stage_entered_at',
+                'leads:id,company_id,stage,loss_reason,assigned_to,created_at,stage_entered_at,contact_name,contact_phone,contact_whatsapp,contact_email,interest_level,purchase_potential,qualification_notes',
                 'leads.assignedTo:id,name',
                 'placesProfile',
             ])
@@ -45,7 +49,8 @@ class CompanyController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('razao_social', 'like', "%{$search}%")
                     ->orWhere('nome_fantasia', 'like', "%{$search}%")
-                    ->orWhere('cnpj', 'like', "%{$search}%");
+                    ->orWhere('cnpj', 'like', "%{$search}%")
+                    ->orWhere('cpf', 'like', "%{$search}%");
             });
         }
 
@@ -77,8 +82,19 @@ class CompanyController extends Controller
             $query->whereHas('leads', fn ($q) => $q->whereDate('created_at', '<=', $createdTo));
         }
 
+        $companies = $query->paginate(15)->withQueryString();
+
+        // `can_edit_contact` por lead: permite o próprio consultor responsável editar contato/
+        // qualificação do seu lead pela página Leads sem precisar de acesso admin/manager (esse é
+        // o critério de companies.update, que cobre os dados cadastrais da Company).
+        $companies->getCollection()->each(function (Company $company) use ($request) {
+            $company->leads->each(function ($lead) use ($request) {
+                $lead->setAttribute('can_edit_contact', Gate::forUser($request->user())->allows('update', $lead));
+            });
+        });
+
         return Inertia::render('Companies/Index', [
-            'companies' => $query->paginate(15)->withQueryString(),
+            'companies' => $companies,
             'filters' => [
                 'search' => $search,
                 'without_active_lead' => $withoutActiveLead,
@@ -95,6 +111,36 @@ class CompanyController extends Controller
                 ->select('loss_reason', 'suggested_recycle_days_min', 'suggested_recycle_days_max', 'is_recyclable')
                 ->get(),
         ]);
+    }
+
+    /**
+     * Cadastro manual de Lead (PF ou PJ) — complementa a importação via CSV (caminho principal
+     * para volume, PJ-only) para o caso de um único Lead que não está em nenhuma planilha.
+     * Company e Lead nascem juntos num único formulário/submit (CreateLeadWithCompanyAction) —
+     * decisão do usuário de tratar o Lead como "entidade completa desde o início", sem telas
+     * separadas para cadastrar a empresa e só depois abrir o lead.
+     */
+    public function store(StoreCompanyRequest $request, CreateLeadWithCompanyAction $action): RedirectResponse
+    {
+        Gate::authorize('create', Company::class);
+
+        $action->execute($request->validated());
+
+        return back()->with('status', 'Lead cadastrado com sucesso.');
+    }
+
+    /**
+     * Edição dos dados cadastrais (Company) e do lead em andamento (se houver), no mesmo
+     * formulário — contraparte de store(). Endereço não entra aqui de propósito: continua
+     * editável só pela aba Mapa do Kanban (updateAddress()), decisão fechada com o usuário.
+     */
+    public function update(UpdateCompanyRequest $request, Company $company, UpdateLeadWithCompanyAction $action): RedirectResponse
+    {
+        Gate::authorize('update', $company);
+
+        $action->execute($company, $request->validated());
+
+        return back()->with('status', 'Lead atualizado com sucesso.');
     }
 
     /**

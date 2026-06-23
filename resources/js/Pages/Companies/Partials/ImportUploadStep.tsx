@@ -25,7 +25,7 @@ export default function ImportUploadStep() {
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                     Sócios (company_partners) não fazem parte deste wizard — só campos cadastrais
-                    da empresa e um contato principal por tipo.
+                    do lead e um contato principal por tipo.
                 </Typography>
 
                 <Stack spacing={2} sx={{ maxWidth: 480 }}>

@@ -49,14 +49,14 @@ export default function FollowUpsSection({ leadId, followUps }: { leadId: number
                     </Typography>
                 )}
                 <Button variant="contained" size="small" onClick={submit} disabled={form.processing}>
-                    Agendar follow-up
+                    Agendar acompanhamento
                 </Button>
             </Stack>
 
             <List dense disablePadding>
                 {followUps.length === 0 && (
                     <Typography variant="body2" color="text.secondary">
-                        Nenhum follow-up agendado ainda.
+                        Nenhum acompanhamento agendado ainda.
                     </Typography>
                 )}
                 {followUps.map((entry) => (

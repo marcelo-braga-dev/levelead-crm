@@ -23,7 +23,7 @@ const typeLabels: Record<InteractionType, string> = {
     visit: 'Visita',
     note: 'Nota',
     stage_change: 'Mudança de etapa',
-    follow_up: 'Follow-up',
+    follow_up: 'Acompanhamento',
     system: 'Sistema',
 };
 

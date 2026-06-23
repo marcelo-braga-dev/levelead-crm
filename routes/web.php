@@ -40,6 +40,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
 
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+    Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::patch('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
     Route::patch('/companies/{company}/address', [CompanyController::class, 'updateAddress'])->name('companies.address.update');
     Route::post('/companies/{company}/places-profile', [GooglePlacesProfileController::class, 'store'])->name('companies.places-profile.store');
 
@@ -55,10 +57,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/kanban', [LeadController::class, 'board'])->name('kanban.board');
     Route::post('/leads', [LeadController::class, 'store'])->name('leads.store');
-    Route::patch('/leads/{lead}', [LeadController::class, 'update'])->name('leads.update');
+    Route::patch('/leads/{lead}/contact', [LeadController::class, 'updateContact'])->name('leads.contact.update');
     Route::delete('/leads/{lead}', [LeadController::class, 'destroy'])->name('leads.destroy');
     Route::post('/leads/{lead}/recycle', [LeadController::class, 'recycle'])->name('leads.recycle');
     Route::patch('/leads/{lead}/stage', [LeadStageController::class, 'update'])->name('leads.stage.update');
+    Route::patch('/leads/{lead}/won-value', [LeadStageController::class, 'confirmWonValue'])->name('leads.won-value.confirm');
 
     Route::post('/leads/{lead}/proposals', [ProposalController::class, 'store'])->name('proposals.store');
     Route::get('/proposal-attachments/{attachment}/download', [ProposalController::class, 'downloadAttachment'])->name('proposals.attachments.download');

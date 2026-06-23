@@ -38,7 +38,7 @@ const entityLabels: Record<string, string> = {
     lead: 'Lead',
     company: 'Company',
     proposal: 'Proposta',
-    follow_up: 'Follow-up',
+    follow_up: 'Acompanhamento',
 };
 
 const actionLabels: Record<string, string> = {

@@ -44,7 +44,7 @@ const drawerWidth = 250;
 const navItems = [
     { label: 'Painel', route: 'dashboard', icon: <DashboardIcon /> },
     { label: 'Kanban', route: 'kanban.board', icon: <ViewKanbanIcon /> },
-    { label: 'Empresas', route: 'companies.index', icon: <BusinessIcon /> },
+    { label: 'Leads', route: 'companies.index', icon: <BusinessIcon /> },
     { label: 'Importar CSV', route: 'companies.import', icon: <UploadFileIcon /> },
 ];
 

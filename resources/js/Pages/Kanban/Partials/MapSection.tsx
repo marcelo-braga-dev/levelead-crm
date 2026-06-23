@@ -277,7 +277,7 @@ export default function MapSection({
                     <RoomIcon sx={{ fontSize: 40, color: 'text.disabled', mb: 1 }} />
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         Ainda não há localização sincronizada para este lead. Busque a localização via
-                        Google para obter as coordenadas da empresa.
+                        Google para obter as coordenadas do lead.
                     </Typography>
                     <Button variant="outlined" size="small" onClick={syncLocation}>
                         Buscar localização via Google

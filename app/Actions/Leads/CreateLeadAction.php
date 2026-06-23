@@ -19,7 +19,10 @@ use DomainException;
 class CreateLeadAction
 {
     /**
-     * @param  array<string, mixed>  $contactOverrides
+     * @param  array<string, mixed>  $contactOverrides  contact_name/contact_phone/contact_whatsapp/
+     *                                                  contact_email (com fallback pro contato principal da Company)
+     *                                                  e, opcionalmente, interest_level/purchase_potential/qualification_notes
+     *                                                  (sem fallback — qualquer chave de `Lead::create()` é aceita aqui).
      * @param  int|null  $leadSourceId  Se omitido, assume a origem "Manual" — quem cria via CSV
      *                                  (ImportCompaniesFromCsvAction) passa a origem "CSV" explicitamente.
      */
@@ -38,16 +41,20 @@ class CreateLeadAction
             ->where('is_primary', true)
             ->value('value');
 
-        $lead = Lead::create([
+        // array_filter remove overrides em branco para não pisar nos defaults (ex.: formulário
+        // unificado de criação manda interest_level/qualification_notes mesmo quando vazios).
+        $overrides = array_filter($contactOverrides, fn ($value) => $value !== null && $value !== '');
+
+        $lead = Lead::create(array_merge([
             'company_id' => $company->id,
             'lead_source_id' => $leadSourceId ?? LeadSource::where('name', 'Manual')->value('id'),
             'stage' => LeadStage::New->value,
-            'contact_name' => $contactOverrides['contact_name'] ?? $company->nome_fantasia ?? $company->razao_social,
-            'contact_phone' => $contactOverrides['contact_phone'] ?? $primaryContact('phone'),
-            'contact_whatsapp' => $contactOverrides['contact_whatsapp'] ?? $primaryContact('whatsapp'),
-            'contact_email' => $contactOverrides['contact_email'] ?? $primaryContact('email'),
+            'contact_name' => $company->nome_fantasia ?? $company->razao_social,
+            'contact_phone' => $primaryContact('phone'),
+            'contact_whatsapp' => $primaryContact('whatsapp'),
+            'contact_email' => $primaryContact('email'),
             'stage_entered_at' => now(),
-        ]);
+        ], $overrides));
 
         // Fit score depende só de dados firmográficos da Company (já disponíveis na criação);
         // sem isso o lead ficaria com fit_score=0/"Cold" até o próximo RecalculateLeadScoresJob diário.

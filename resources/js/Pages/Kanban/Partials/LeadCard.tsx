@@ -129,7 +129,7 @@ export default function LeadCard({
                             />
                         )}
                         {nextFollowUp && (
-                            <Tooltip title={`Follow-up agendado para ${formatShortDate(nextFollowUp.scheduled_at)}`}>
+                            <Tooltip title={`Acompanhamento agendado para ${formatShortDate(nextFollowUp.scheduled_at)}`}>
                                 <Chip
                                     size="small"
                                     variant={nextFollowUp.status === 'overdue' ? 'filled' : 'outlined'}
